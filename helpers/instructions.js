@@ -1,8 +1,5 @@
 const con = require("../models/db");
 
-// update(table_name,paypload(),{where});
-// delete(table_name,{where});
-// get_data(table_name,{where},orderby);
 // run_sql(sql_script);
 //
 //-----------------------------------------------------------------
@@ -53,7 +50,7 @@ const add = (tablename, user_payload) => {
 };
 //-----------------------------------------------------------------
 //
-//-----------------------------------------------------------------
+// get_data(table_name,{where},orderby);
 const view = (tablename, id) => {
   console.log("Inside View HELPER");
   // console.log(tablename);
@@ -108,43 +105,182 @@ const view = (tablename, id) => {
 };
 //-----------------------------------------------------------------
 //
+//update(table_name,paypload(),{where});
+const edit = (update_payload) => {
+  console.log("Inside Edit HELPER");
+  // console.log(tablename);
+  // console.log(user_payload);
+  const promise1 = new Promise((resolve, reject) => {
+    // let update_payload = {
+    //   table_name = 'users',
+    //   query_field = 'email',
+    //   query_value = 'j.smith.old@example.com',
+    //   dataToSave = {
+    //     username: 'j.smith',
+    //     user_type: 'job_seeker',
+    //     name: 'john smith',
+    //     email: 'j.smith.new@example.com',
+    //     password: 'keyboard_cat_new',
+    //     resume: true,
+    //     resume_date_time: '2109-01-01',
+    //     salary_expectation: 100000
+    //   }
+    // };
+    const sql = con.query(
+      "UPDATE ?? SET ? WHERE ?? = ? ",
+      [
+        update_payload.table_name,
+        update_payload.dataToSave,
+        update_payload.query_field,
+        update_payload.query_value,
+      ],
+      (err, result) => {
+        if (!err) {
+          //  console.log(result);
+          if (result && result.affectedRows > 0) {
+            console.log("Query Success - Edit HELPER");
+            const LLastID = result.insertId;
+            const Response = {
+              status: "success",
+              id: LLastID,
+            };
+            resolve(Response);
+          }
+        } else {
+          console.log("Query Error - Edit HELPER");
+          reject(err);
+        }
+      }
+    );
+    // console.log(sql.sql);
+  });
+  const dd = promise1
+    .then((value) => {
+      console.log("promise done - Edit HELPER");
+      //console.log(value);
+      return value;
+    })
+    .catch((error) => {
+      console.log("Catch Error - Edit HELPER");
+      // console.log(error);
+      const Error = {
+        status: "error",
+        message: error,
+      };
+      return Error;
+    });
+  return dd;
+};
 //-----------------------------------------------------------------
+//
+// delete(table_name,{where});
+const deleteHelper = (table_name, id) => {
+  console.log("Inside Delete HELPER");
+  // console.log(tablename);
+  // console.log(user_payload);
+  const promise1 = new Promise((resolve, reject) => {
+    let update_payload = {
+      table_name: table_name,
+      query_field: "id",
+      query_value: id,
+      dataToSave: {
+        trash: 1,
+      },
+    };
+    const sql = con.query(
+      "UPDATE ?? SET ? WHERE ?? = ? ",
+      [
+        update_payload.table_name,
+        update_payload.dataToSave,
+        update_payload.query_field,
+        update_payload.query_value,
+      ],
+      (err, result) => {
+        if (!err) {
+          console.log(result);
+          if (result && result.changedRows > 0) {
+            console.log("Query Success - Delete HELPER");
+            const Response = {
+              status: "success",
+            };
+            resolve(Response);
+          } else {
+            reject();
+          }
+        } else {
+          console.log("Query Error - Delete HELPER");
+          reject(err);
+        }
+      }
+    );
+    // console.log(sql.sql);
+  });
+  const dd = promise1
+    .then((value) => {
+      console.log("promise done - Delete HELPER");
+      //console.log(value);
+      return value;
+    })
+    .catch((error) => {
+      console.log("Catch Error - Delete HELPER");
+      // console.log(error);
+      const Error = {
+        status: "error",
+        message: error,
+      };
+      return Error;
+    });
+  return dd;
+};
+//-----------------------------------------------------------------
+//
 const errorHelper = async (err) => {
   console.log("Inside Error Helper");
   console.log(err);
   var messageERR;
   var code;
   var f;
-  if (err.code == "ER_BAD_FIELD_ERROR") {
-    messageERR = err.sqlMessage;
-    code = 400;
-  } else if (err.code == "ER_NO_DEFAULT_FOR_FIELD") {
-    messageERR = err.sqlMessage;
-    code = 400;
-  } else if (err.code == "ER_DUP_ENTRY") {
-    messageERR = err.sqlMessage;
-    code = 400;
-    // let result = err.sqlMessage.includes("position");
-    // if (result == true) {
-    //   messageERR = "Position Already Exists";
-    //   // const Error = { status: "error", message: messageERR };
-    //   // res.status(400).json(Error);
-    // } else {
-    //   let result1 = err.sqlMessage.includes("name");
-    //   if (result1 == true) {
-    //     messageERR = "Name Already Exists";
-    //     // const Error = { status: "error", message: messageERR };
-    //     // res.status(400).json(Error);
-    //   }
-    // }
+
+  if (err && err !== undefined && Object.keys(err).length != 0) {
+    //
+    if (err.code == "ER_BAD_FIELD_ERROR") {
+      messageERR = err.sqlMessage;
+      code = 400;
+    } else if (err.code == "ER_NO_DEFAULT_FOR_FIELD") {
+      messageERR = err.sqlMessage;
+      code = 400;
+    } else if (err.code == "ER_DUP_ENTRY") {
+      messageERR = err.sqlMessage;
+      code = 400;
+      // let result = err.sqlMessage.includes("position");
+      // if (result == true) {
+      //   messageERR = "Position Already Exists";
+      //   // const Error = { status: "error", message: messageERR };
+      //   // res.status(400).json(Error);
+      // } else {
+      //   let result1 = err.sqlMessage.includes("name");
+      //   if (result1 == true) {
+      //     messageERR = "Name Already Exists";
+      //     // const Error = { status: "error", message: messageERR };
+      //     // res.status(400).json(Error);
+      //   }
+      // }
+    } else {
+      messageERR = "Sql Error";
+      code = 400;
+    }
+    f = { message: messageERR, statusCode: code };
+    return f;
   } else {
     messageERR = "Sql Error";
     code = 400;
+    f = { message: messageERR, statusCode: code };
+    return f;
   }
-  f = { message: messageERR, statusCode: code };
-  return f;
 };
-module.exports = { errorHelper, add, view };
+//-----------------------------------------------------------------
+//
+module.exports = { errorHelper, add, view, edit, deleteHelper };
 //-----------------------------------------------------------------
 //
 //*************************************************************************
