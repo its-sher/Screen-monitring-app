@@ -27,12 +27,13 @@ const dbempty = (req, res, next) => {
 const checkemployee = (req, res, next) => {
   console.log("---checkemployee Middleware---");
   //console.log(req.params.id);
-  const encryptedid = req.params.id;
-  const idvalue = decodetheid(encryptedid);
+  const idvalue = Number(req.params.id);
   // console.log(idvalue);
+  // console.log(typeof idvalue);
   const checkNum = Number.isInteger(idvalue);
   //console.log(checkNum);
   if (checkNum == true) {
+    // console.log("NUMBER");
     //if id is integer
     con.query(
       "SELECT id from employees WHERE id=?",

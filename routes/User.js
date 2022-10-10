@@ -6,14 +6,14 @@ console.log("Inside User.js routes");
 //
 router.post("/", checkemployeealready, userController.CreateUser); //ADD
 
-router.get("/single/:id", checkemployee, userController.GetUserById); //VIEW
+router.get("/:id", checkemployee, userController.GetUserById); //VIEW
 router.put(
-  "/update/:id",
+  "/:id",
   checkemployee,
   checkemployeealready,
   userController.UpdateUser
 ); //EDIT
-router.delete("/delete/:id", checkemployee, userController.DeleteUser); //DELETE
+router.delete("/:id", checkemployee, userController.DeleteUser); //DELETE
 //
 //---------------------------------------------------------------------------------
 router.get(

@@ -1,9 +1,6 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
-//mysql - session-------
-const session = require("express-session");
-var MySQLStore = require("express-mysql-session")(session);
 //
 const cors = require("cors");
 const port = process.env.PORT; //8000
@@ -33,30 +30,6 @@ app.use(
     credentials: true,
   })
 );
-//session
-const sessionStore = new MySQLStore({}, con);
-app.use(
-  session({
-    name: "sid",
-    key: process.env.SESSION_COOKIE_KEY,
-    secret: process.env.SESSION_COOKIE_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    //sameSite: true, // it works true only if secure is true or options
-    store: sessionStore,
-    cookie: {
-      //path: "/",  //-------------------------by default same
-      //_expires: 60000,//60seconds
-      //originalMaxAge: null,
-      //httpOnly: true, //---------------------by default same
-      //secure: true,//-----------------------by default false
-      maxAge: 30 * 24 * 60 * 60 * 1000, //1month
-      // Forces to use https in production
-      secure: process.env.NODE_ENV === "production" ? true : false, // now development so false
-    },
-  })
-);
-
 console.log("Inside index.js");
 //
 app.get("/", (req, res) => {
