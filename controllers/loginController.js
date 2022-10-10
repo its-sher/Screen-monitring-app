@@ -75,83 +75,83 @@ const LoginUser = async (req, res) => {
                     //HANDLING SESSION-------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++STARTS
                     //create user token start--save that encrypted access token in db n cookie
                     const token = usertokencreation(result);
-                    //
-                    var ip =
-                      req.header("x-forwarded-for") ||
-                      req.connection.remoteAddress;
-                    //console.log("IP ADDRESS-->" + ip);
-                    //SESSION has cookie------------------------------------------------------------1
-                    //ADDING DATA TO SESSION (NOT TABLE)---------------STARTS
-                    req.session.users_id = encodedid; //session gets users_id------------------------2
-                    req.session.accesstoken = token; //session gets accesstoken-----------------------3
-                    //
-                    //  console.log("Session id");
-                    const sessionID = req.sessionID; //session id used to save data in row
-                    //  console.log(sessionID);
-                    req.session.sess_id = sessionID; //session gets session id-----------------------------4
-                    //
-                    req.session.ipaddress = ip; //session gets ipaddress-----------------------------5
-                    // req.session.isAuth = true;
-                    req.session.login = true; //session gets login------------------------------------6
-                    //
-                    //
-                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxx
-                    //active status for user
-                    req.session.active = result[0].active; //session gets active value-----------------------------------6-B
-                    //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxx
-                    //
-                    //ADDING DATA TO SESSION (NOT TABLE)----------------ENDS
-                    // console.log("Final Session");
-                    //  console.log(req.session);
-                    //Colect Data to update in session table, then update it **********************************STARTS
-                    //
-                    const UseridTokenData = {
-                      //users_id: userId,//ezmoov-->this was used
-                      users_id: encodedid, //teamlogger-->this is used
-                      access_token: token,
-                      ipaddress: ip,
-                      entity: "Employee",
-                    };
-                    //console.log(UseridTokenData);
-                    //start-11111^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    setTimeout(function () {
-                      const sql = con.query(
-                        // con.query(
-                        "UPDATE sessions SET ? WHERE session_id=?",
-                        [UseridTokenData, sessionID],
-                        (err, result) => {
-                          if (!err) {
-                            //console.log(result);
-                            if (result.changedRows > 0) {
-                              console.log(
-                                "Record Updated wd token n dash-user id"
-                              );
-                            } else {
-                              console.log("Update Error --  NOTHING UPDATED");
-                              const Error = {
-                                status: "error",
-                                message: "Server Error",
-                              };
-                              res.status(400).json(Error);
-                            }
-                          } else {
-                            console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                            console.log(err);
-                            const Error = {
-                              status: "error",
-                              message: "Server Error",
-                            };
-                            res.status(400).json(Error);
-                          }
-                        }
-                      );
-                      console.log(sql.sql);
-                    }, 1000);
-                    //ends--11111^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    //Colect Data to update in session table, then update it **********************************ENDS
-                    //HANDLING SESSION-------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++ENDS
-                    //
-                    const sessdata = req.session;
+                    // //
+                    // var ip =
+                    //   req.header("x-forwarded-for") ||
+                    //   req.connection.remoteAddress;
+                    // //console.log("IP ADDRESS-->" + ip);
+                    // //SESSION has cookie------------------------------------------------------------1
+                    // //ADDING DATA TO SESSION (NOT TABLE)---------------STARTS
+                    // req.session.users_id = encodedid; //session gets users_id------------------------2
+                    // req.session.accesstoken = token; //session gets accesstoken-----------------------3
+                    // //
+                    // //  console.log("Session id");
+                    // const sessionID = req.sessionID; //session id used to save data in row
+                    // //  console.log(sessionID);
+                    // req.session.sess_id = sessionID; //session gets session id-----------------------------4
+                    // //
+                    // req.session.ipaddress = ip; //session gets ipaddress-----------------------------5
+                    // // req.session.isAuth = true;
+                    // req.session.login = true; //session gets login------------------------------------6
+                    // //
+                    // //
+                    // //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxx
+                    // //active status for user
+                    // req.session.active = result[0].active; //session gets active value-----------------------------------6-B
+                    // //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxx
+                    // //
+                    // //ADDING DATA TO SESSION (NOT TABLE)----------------ENDS
+                    // // console.log("Final Session");
+                    // //  console.log(req.session);
+                    // //Colect Data to update in session table, then update it **********************************STARTS
+                    // //
+                    // const UseridTokenData = {
+                    //   //users_id: userId,//ezmoov-->this was used
+                    //   users_id: encodedid, //teamlogger-->this is used
+                    //   access_token: token,
+                    //   ipaddress: ip,
+                    //   entity: "Employee",
+                    // };
+                    // //console.log(UseridTokenData);
+                    // //start-11111^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    // setTimeout(function () {
+                    //   const sql = con.query(
+                    //     // con.query(
+                    //     "UPDATE sessions SET ? WHERE session_id=?",
+                    //     [UseridTokenData, sessionID],
+                    //     (err, result) => {
+                    //       if (!err) {
+                    //         //console.log(result);
+                    //         if (result.changedRows > 0) {
+                    //           console.log(
+                    //             "Record Updated wd token n dash-user id"
+                    //           );
+                    //         } else {
+                    //           console.log("Update Error --  NOTHING UPDATED");
+                    //           const Error = {
+                    //             status: "error",
+                    //             message: "Server Error",
+                    //           };
+                    //           res.status(400).json(Error);
+                    //         }
+                    //       } else {
+                    //         console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
+                    //         console.log(err);
+                    //         const Error = {
+                    //           status: "error",
+                    //           message: "Server Error",
+                    //         };
+                    //         res.status(400).json(Error);
+                    //       }
+                    //     }
+                    //   );
+                    //   console.log(sql.sql);
+                    // }, 1000);
+                    // //ends--11111^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    // //Colect Data to update in session table, then update it **********************************ENDS
+                    // //HANDLING SESSION-------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++ENDS
+                    // //
+                    // const sessdata = req.session;
                     const Response = {
                       login: true,
                       sessdata,

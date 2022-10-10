@@ -2,7 +2,12 @@ var moment = require("moment");
 const con = require("../models/db");
 const bcrypt = require("bcrypt");
 const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
-const { add, view, errorHelper } = require("../helpers/instructions");
+const {
+  add,
+  view,
+  errorHelper,
+  deleteHelper,
+} = require("../helpers/instructions");
 const {
   UserAccountVerificationCodeEmail,
   ForgotPasswordVerificationCodeEmail,
@@ -717,44 +722,48 @@ const UpdateUser = async (req, res) => {
 //-----------------------------------------------------------------------------------------------------------------
 //
 // DELETE a user in database table --users--------------------------------------------------
-const DeleteUser = (req, res) => {
-  //console.log("inside del user");
+const DeleteUser = async (req, res) => {
+  console.log("Inside Delete User");
   //console.log(req);
-
-  const encryptedid = req.params.id;
-  const userId = decodetheid(encryptedid);
+  //
+  // const encryptedid = req.params.id;
+  // const userId = decodetheid(encryptedid);
+  const userId = req.params.id;
   // console.log(userId);
-
-  //con.query("DELETE FROM users WHERE id=?", [userId], (err, response) => {//del from table
-  const sql = con.query(
-    "UPDATE users SET trash = 1 WHERE id=?", //only update variable trash n hide
-    [userId],
-    (err, response) => {
-      // if (typeof response === "undefined") {
-      //   const Response = {
-      //     data: { message: "Not Permitted to Delete" },
-      //   };
-      //   res.status(204).json(Response);
-      // } else
-      if (!err) {
-        if (response && response.affectedRows > 0) {
-          const Response = {
-            status: "success",
-            responsedata: { message: "user deleted successfully" },
-          };
-          res.status(200).json(Response);
-        } else {
-          console.log("NOTHING UPDATED");
-          const Error = { status: "error", message: "Invalid Details" };
-          res.status(400).json(Error);
-        }
-      } else {
-        console.log(err);
-        const Error = { status: "error", message: "Server Error" };
-        res.status(400).json(Error);
-      }
+  //
+  //STEP_1---deleteUser----------------STARTS
+  //------------------------------------------------------
+  async function deleteUser(deleteID) {
+    console.log("Inside deleteUser");
+    //   console.log(deleteID);
+    //
+    const respDelete = await deleteHelper(table_name, deleteID);
+    console.log("Back 1");
+    //console.log(respDelete);
+    if (respDelete.status == "success") {
+      console.log("Success User Deleted");
+      const Response = {
+        status: "success",
+        message: "User Deleted Successfully",
+      };
+      res.status(201).json(Response);
+    } else if (respDelete.status == "error") {
+      console.log("Error");
+      const err = respDelete.message;
+      const respError = await errorHelper(err);
+      console.log("Back 2");
+      //  console.log(respError);
+      const Error = {
+        status: "error",
+        message: respError.message,
+      };
+      res.status(respError.statusCode).json(Error);
     }
-  );
+  }
+  await deleteUser(userId);
+  //STEP_1---deleteUser----------------ENDS
+  //------------------------------------------------------
+  //
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
