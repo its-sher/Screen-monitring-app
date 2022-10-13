@@ -3,33 +3,87 @@ const con = require("../models/db");
 // run_sql(sql_script);
 //
 //-----------------------------------------------------------------
-const add = (tablename, user_payload) => {
+const add = (add_payload) => {
   console.log("Inside Add HELPER");
-  // console.log(tablename);
-  // console.log(user_payload);
+  //customUrlFields--------------------------------------------
+  // let add_payload = {
+  //   sql_script:
+  //     "INSERT INTO configuration (config_key, config_value) VALUES ?",
+  //   sql_values: arr,
+  // };
+  //
+  //OR
+  //normal--------------------------------------------
+  // let add_payload = {
+  //   table_name: table_name,
+  //   query_field: "id",
+  //   query_value: id,
+  //   dataToSave: {
+  //     trash: 1,
+  //   },
+  // };
   const promise1 = new Promise((resolve, reject) => {
-    const sql = con.query(
-      "INSERT INTO " + [tablename] + " SET ?",
-      [user_payload],
-      (err, result) => {
-        if (!err) {
-          //  console.log(result);
-          if (result && result.affectedRows > 0) {
-            console.log("Query Success - Add HELPER");
-            const LLastID = result.insertId;
-            const Response = {
-              status: "success",
-              id: LLastID,
-            };
-            resolve(Response);
-          }
+    var sqll;
+    var params;
+    var normal = 0;
+    var customUrlFields = 0;
+    console.log(add_payload);
+    if (
+      add_payload.sql_script &&
+      add_payload.sql_script.length > 0 &&
+      //
+      add_payload.sql_values &&
+      add_payload.sql_values.length > 0
+    ) {
+      console.log("Custom Url And FIELDS");
+      customUrlFields = 1;
+    } else if (
+      add_payload.table_name &&
+      add_payload.table_name.length > 0 &&
+      //
+      add_payload.dataToSave &&
+      add_payload.dataToSave !== undefined &&
+      Object.keys(add_payload.dataToSave).length != 0
+    ) {
+      console.log("Normal Insert");
+      normal = 1;
+    } else {
+      const Error = {
+        code: "INVALID_SQL_PARAMS",
+        sqlMessage: "Invalid Sql Params",
+      };
+      reject(Error);
+    }
+
+    if (normal == 1) {
+      sqll = "INSERT INTO " + [add_payload.table_name] + " SET ?";
+      params = [add_payload.dataToSave];
+    } else if (customUrlFields == 1) {
+      sqll = add_payload.sql_script;
+      params = [add_payload.sql_values];
+    }
+
+    const sql = con.query(sqll, params, (err, result) => {
+      if (!err) {
+        //  console.log(result);
+        if (result && result.affectedRows > 0) {
+          console.log("Query Success - Add HELPER");
+          const LLastID = result.insertId;
+          const Response = {
+            status: "success",
+            id: LLastID,
+          };
+          resolve(Response);
         } else {
-          console.log("Query Error - Add HELPER");
-          reject(err);
+          console.log("Nothing Updated - Add HELPER ");
+          reject();
         }
+      } else {
+        console.log("Query Error - Add HELPER");
+        reject(err);
       }
-    );
-    // console.log(sql.sql);
+    });
+    console.log(sql.sql);
   });
   const dd = promise1
     .then((value) => {
@@ -48,43 +102,90 @@ const add = (tablename, user_payload) => {
     });
   return dd;
 };
+
 //-----------------------------------------------------------------
 //
 // get_data(table_name,{where},orderby);
-const view = (tablename, id) => {
+const view = (view_payload) => {
   console.log("Inside View HELPER");
-  // console.log(tablename);
-  // console.log(id);
-
+  // console.log(view_payload);
+  // let view_payload = {
+  //   table_name: table_name,
+  //   query_field: "id",
+  //   query_value: id,
+  //   dataToGet: {
+  //     trash: 1,
+  //   },
+  // };
   const promise1 = new Promise((resolve, reject) => {
-    const sql = con.query(
-      "SELECT * FROM " + [tablename] + " WHERE id=?",
-      [id],
-      (err, result) => {
-        if (!err) {
-          console.log(result);
-          if (result && result.length > 0) {
-            console.log("Query Success - View HELPER");
-            //array is defined and is not empty
-            //
-            //removing row data packet-------------STARTS
-            var resultArray = Object.values(JSON.parse(JSON.stringify(result)));
-            //  console.log(resultArray);
-            //removing row data packet-------------ENDS
-            //
-            const Response = {
-              status: "success",
-              data: resultArray,
-            };
-            resolve(Response);
-          }
-        } else {
-          console.log("Query Error - View HELPER");
-          reject(err);
-        }
+    var sqll;
+    var nameAndGet = 0;
+    var queryAndValue = 0;
+    if (
+      view_payload.table_name &&
+      view_payload.table_name.length > 0 &&
+      view_payload.dataToGet &&
+      view_payload.dataToGet.length > 0
+    ) {
+      nameAndGet = 1;
+      if (
+        view_payload.query_field &&
+        view_payload.query_field.length > 0 &&
+        view_payload.query_value
+      ) {
+        queryAndValue = 1;
       }
-    );
-    // console.log(sql.sql);
+    } else {
+      const Error = {
+        code: "INVALID_SQL_PARAMS",
+        sqlMessage: "Invalid Sql Params",
+      };
+      reject(Error);
+    }
+
+    if (queryAndValue == 1) {
+      sqll = "SELECT " + [view_payload.dataToGet] + " FROM ?? WHERE ?? = ?";
+      params = [
+        view_payload.table_name,
+        view_payload.query_field,
+        view_payload.query_value,
+      ];
+    } else if (nameAndGet == 1) {
+      sqll = "SELECT " + [view_payload.dataToGet] + " FROM ??";
+      params = [view_payload.table_name];
+    }
+
+    const sql = con.query(sqll, params, (err, result) => {
+      if (!err) {
+        //console.log(result);
+        if (result && result.length > 0) {
+          console.log("Query Success - View HELPER");
+          //array is defined and is not empty
+          //
+          //removing row data packet-------------STARTS
+          var resultArray = Object.values(JSON.parse(JSON.stringify(result)));
+          //  console.log(resultArray);
+          //removing row data packet-------------ENDS
+          //
+          const Response = {
+            status: "success",
+            data: resultArray,
+          };
+          resolve(Response);
+        } else {
+          console.log("No Data - View HELPER ");
+          const Error = {
+            code: "NO_DATA",
+            sqlMessage: "No Data",
+          };
+          reject(Error);
+        }
+      } else {
+        console.log("Query Error - View HELPER");
+        reject(err);
+      }
+    });
+    console.log(sql.sql);
   });
   const dd = promise1
     .then((value) => {
@@ -145,6 +246,9 @@ const edit = (update_payload) => {
               id: LLastID,
             };
             resolve(Response);
+          } else {
+            console.log("Nothing Updated - Edit HELPER ");
+            reject();
           }
         } else {
           console.log("Query Error - Edit HELPER");
@@ -174,41 +278,42 @@ const edit = (update_payload) => {
 //-----------------------------------------------------------------
 //
 // delete(table_name,{where});
-const deleteHelper = (table_name, id) => {
-  console.log("Inside Delete HELPER");
-  // console.log(tablename);
-  // console.log(user_payload);
+const deleteTrashHelper = (delete_payload) => {
+  console.log("Inside deleteTrashHelper");
+  // console.log(delete_payload);
+  // let delete_payload = {
+  //   table_name: table_name,
+  //   query_field: "id",
+  //   query_value: id,
+  // dataToSave: {
+  //   active: 0,
+  //   trash: 1,
+  // },
+  // };
   const promise1 = new Promise((resolve, reject) => {
-    let update_payload = {
-      table_name: table_name,
-      query_field: "id",
-      query_value: id,
-      dataToSave: {
-        trash: 1,
-      },
-    };
     const sql = con.query(
       "UPDATE ?? SET ? WHERE ?? = ? ",
       [
-        update_payload.table_name,
-        update_payload.dataToSave,
-        update_payload.query_field,
-        update_payload.query_value,
+        delete_payload.table_name,
+        delete_payload.dataToSave,
+        delete_payload.query_field,
+        delete_payload.query_value,
       ],
       (err, result) => {
         if (!err) {
           console.log(result);
           if (result && result.changedRows > 0) {
-            console.log("Query Success - Delete HELPER");
+            console.log("Query Success - deleteTrashHelper");
             const Response = {
               status: "success",
             };
             resolve(Response);
           } else {
+            console.log("Nothing Trashed - deleteTrashHelper ");
             reject();
           }
         } else {
-          console.log("Query Error - Delete HELPER");
+          console.log("Query Error - deleteTrashHelper");
           reject(err);
         }
       }
@@ -217,13 +322,76 @@ const deleteHelper = (table_name, id) => {
   });
   const dd = promise1
     .then((value) => {
-      console.log("promise done - Delete HELPER");
+      console.log("promise done - deleteTrashHelper");
       //console.log(value);
       return value;
     })
     .catch((error) => {
-      console.log("Catch Error - Delete HELPER");
+      console.log("Catch Error - deleteTrashHelper");
       // console.log(error);
+      const Error = {
+        status: "error",
+        message: error,
+      };
+      return Error;
+    });
+  return dd;
+};
+//-----------------------------------------------------------------
+//
+const deleteHelper = (delete_payload) => {
+  console.log("Inside deleteHelper");
+  // console.log(delete_payload);
+  // let delete_payload = {
+  //   table_name: table_name,
+  //   query_field: "id",
+  //   query_value: id,
+  // };
+  const promise1 = new Promise((resolve, reject) => {
+    const sql = con.query(
+      "DELETE FROM ?? WHERE ?? = ?",
+      [
+        delete_payload.table_name,
+        delete_payload.query_field,
+        delete_payload.query_value,
+      ],
+      (err, result) => {
+        console.log(result);
+        if (typeof result === "undefined") {
+          console.log("Not Permitted to Delete");
+          const Error = {
+            code: "NOT_PERMITTED_TO_DELETE",
+            sqlMessage: "Not Permitted to Delete",
+          };
+          reject(Error);
+        } else if (!err) {
+          if (result && result.affectedRows > 0) {
+            console.log("Query Success - deleteHelper");
+            const Response = {
+              status: "success",
+            };
+            resolve(Response);
+          } else {
+            console.log("Nothing Deleted - deleteHelper ");
+            reject();
+          }
+        } else {
+          console.log("Query Error - deleteHelper");
+          reject(err);
+        }
+      }
+    );
+    // console.log(sql.sql);
+  });
+  const dd = promise1
+    .then((value) => {
+      console.log("promise done - deleteHelper");
+      //console.log(value);
+      return value;
+    })
+    .catch((error) => {
+      console.log("Catch Error - deleteHelper");
+      console.log(error);
       const Error = {
         status: "error",
         message: error,
@@ -243,7 +411,19 @@ const errorHelper = async (err) => {
 
   if (err && err !== undefined && Object.keys(err).length != 0) {
     //
-    if (err.code == "ER_BAD_FIELD_ERROR") {
+    if (err.code == "NO_DATA") {
+      messageERR = err.sqlMessage;
+      code = 204;
+    } else if (err.code == "INVALID_SQL_PARAMS") {
+      messageERR = err.sqlMessage;
+      code = 400;
+    } else if (err.code == "ER_EMPTY_QUERY") {
+      messageERR = err.sqlMessage;
+      code = 400;
+    } else if (err.code == "NOT_PERMITTED_TO_DELETE") {
+      messageERR = err.sqlMessage;
+      code = 400;
+    } else if (err.code == "ER_BAD_FIELD_ERROR") {
       messageERR = err.sqlMessage;
       code = 400;
     } else if (err.code == "ER_NO_DEFAULT_FOR_FIELD") {
@@ -255,7 +435,7 @@ const errorHelper = async (err) => {
       // let result = err.sqlMessage.includes("position");
       // if (result == true) {
       //   messageERR = "Position Already Exists";
-      //   // const Error = { status: "error", message: messageERR };
+      //   // const Error = { status: "error", messuser_payloadage: messageERR };
       //   // res.status(400).json(Error);
       // } else {
       //   let result1 = err.sqlMessage.includes("name");
@@ -280,7 +460,14 @@ const errorHelper = async (err) => {
 };
 //-----------------------------------------------------------------
 //
-module.exports = { errorHelper, add, view, edit, deleteHelper };
+module.exports = {
+  errorHelper,
+  add,
+  view,
+  edit,
+  deleteHelper,
+  deleteTrashHelper,
+};
 //-----------------------------------------------------------------
 //
 //*************************************************************************
@@ -325,7 +512,6 @@ module.exports = { errorHelper, add, view, edit, deleteHelper };
 //       if (WHERE) {
 //         sql = sql + " WHERE " + WHERE;
 //         console.log(sql);
-//         // const WHERE = WHERE != null ? WHERE : "";
 //       }
 //       if (ORDER_BY) {
 //         sql = sql + " ORDER BY " + ORDER_BY;

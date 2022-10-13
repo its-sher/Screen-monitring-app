@@ -47,6 +47,21 @@ const refreshtokencreation = (req, res) => {
   return md5encryption;
 };
 //-----------------------------------------------------------------
+const apikey = async (req, res) => {
+  //console.log(req);
+  const result = req;
+  // console.log(result);
+  const random_key = uuidv4();
+  console.log(random_key);
+  const data = random_key + result + "i am just a string";
+  console.log(data); //concat 194123456789
+  let md5encryption = md5(data);
+  //console.log(md5encryption);
+  let encoded = base64encode(md5encryption);
+  //console.log(encoded);//MjQ5MTAxMjAuNzE3MDU3MDUz
+  return encoded;
+};
+//-----------------------------------------------------------------
 const create_token = (req, res) => {
   //params-->  basic_auth
   //return access_token, refresh_token
@@ -79,4 +94,9 @@ const create_token = (req, res) => {
 // 	}
 // }
 
-module.exports = { accesstokencreation, refreshtokencreation, create_token };
+module.exports = {
+  accesstokencreation,
+  refreshtokencreation,
+  apikey,
+  create_token,
+};
