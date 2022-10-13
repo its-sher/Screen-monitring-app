@@ -6,7 +6,8 @@ const {
   add,
   view,
   errorHelper,
-  deleteHelper,
+  //deleteHelper,
+  deleteTrashHelper,
 } = require("../helpers/instructions");
 const {
   UserAccountVerificationCodeEmail,
@@ -14,39 +15,39 @@ const {
   VerificationCodeEmail,
   OtpVerified,
   UserPasswordChangedEmail,
-} = require("../helpers/user");
+} = require("../helpers/employee");
+const { apikey } = require("../helpers/user-token-creation");
 const domainpath = process.env.REACT_APP_DOMAIN_ENDPOINT;
 //
-console.log("Inside User controller");
+console.log("Inside Employee Controller");
 const table_name = "employees";
 //
 //-------------------------------------------------------------------------------------------------------------
-//USER LOGIN ___________________________________________________ENDS
 //
-// Add a user  into database table --users-DONE--------------------------------------------------------------
-const CreateUser = async (req, res) => {
-  console.log("inside CreateUser");
-  const dataUserTable = req.body;
-  //console.log(dataUserTable);
+// Add a employee into database table --employees-DONE--------------------------------------------------------------
+const CreateEmployee = async (req, res) => {
+  console.log("inside CreateEmployee");
+  const dataEmployeeTable = req.body;
+  //console.log(dataEmployeeTable);
   //
   if (
-    dataUserTable.first_Name &&
-    dataUserTable.first_Name.length > 0 &&
-    dataUserTable.last_Name &&
-    dataUserTable.last_Name.length > 0 &&
-    dataUserTable.phone &&
-    dataUserTable.phone > 0 &&
-    dataUserTable.email &&
-    dataUserTable.email.length > 0 &&
-    dataUserTable.password &&
-    dataUserTable.password.length > 0
+    dataEmployeeTable.first_Name &&
+    dataEmployeeTable.first_Name.length > 0 &&
+    dataEmployeeTable.last_Name &&
+    dataEmployeeTable.last_Name.length > 0 &&
+    dataEmployeeTable.phone &&
+    dataEmployeeTable.phone > 0 &&
+    dataEmployeeTable.email &&
+    dataEmployeeTable.email.length > 0 &&
+    dataEmployeeTable.password &&
+    dataEmployeeTable.password.length > 0
   ) {
-    console.log("dataUserTable");
-    //   console.log(dataUserTable);
+    console.log("dataEmployeeTable");
+    //   console.log(dataEmployeeTable);
     //
-    //STEP_1---Store data into table and create user and return id----------------
+    //STEP_1---Store data into table to create employee and return id----------------
     //HASHING password AND STORING all data into db
-    const password = dataUserTable.password;
+    const password = dataEmployeeTable.password;
     bcrypt.hash(password, 10, async (err, hash) => {
       if (err) {
         console.log(err);
@@ -54,45 +55,70 @@ const CreateUser = async (req, res) => {
         res.status(400).json(Error);
       } else {
         //inserting new value into object key passwordHash
-        dataUserTable["password"] = hash;
-        //console.log(dataUserTable);
-        let filteredDataUser = Object.fromEntries(
-          Object.entries(dataUserTable).filter(
+        dataEmployeeTable["password"] = hash;
+        //console.log(dataEmployeeTable);
+        let filteredData = Object.fromEntries(
+          Object.entries(dataEmployeeTable).filter(
             ([_, v]) => v != "null" && v != "" && v != null
           )
         );
-        // console.log(filteredDataUser);
+        // console.log(filteredData);
         //
-        //STEP_1---createUser and get data----------------STARTS
+        //generate apikey-------------------------------------Starts
+        const randomStr = dataEmployeeTable.last_Name.concat(
+          dataEmployeeTable.email
+        );
+        //console.log(randomStr);
+        const api_key = await apikey(randomStr);
+        //console.log("BCK");
+        //console.log(api_key);
+        filteredData["api_key"] = api_key;
+        //generate apikey-------------------------------------Ends
+        //
+        //STEP_1---CreateEmployee and get data----------------STARTS
         //------------------------------------------------------
-        async function createUser(saveData) {
-          console.log("Inside createUser");
+        async function createEmployee(saveData) {
+          console.log("Inside createEmployee");
           //   console.log(saveData);
           //
-          const respAdd = await add(table_name, saveData);
+          let add_payload = {
+            table_name: table_name,
+            dataToSave: saveData,
+          };
+          //console.log(add_payload);
+          const respAdd = await add(add_payload);
           console.log("Back 1");
           //console.log(respAdd);
           if (respAdd.status == "success") {
-            console.log("Success User Created");
+            console.log("Success Employee Created");
             const id = respAdd.id;
-            const respView = await view(table_name, id);
+            //
+            //Get data for created employee-------------STARTS
+            let view_payload = {
+              table_name: table_name,
+              dataToGet:
+                "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, employee_id, active, description",
+              query_field: "id",
+              query_value: id,
+            };
+            const respView = await view(view_payload);
             console.log("Back 2");
             //console.log(respView);
             if (respView.status == "success") {
-              console.log("Success User Data Got");
+              console.log("Success Employee Data Got");
               var finalData = respView.data;
               delete finalData.trash;
               delete finalData.password;
               const Response = {
-                message: respView.status, //"User Created Successfully",
-                user: respView.data,
+                message: respView.status, //"Employee Created Successfully",
+                responsedata: { user: respView.data },
               };
               res.status(201).json(Response);
             } else if (respView.status == "error") {
               console.log("Error");
               const err = respAdd.message;
               const respError = await errorHelper(err);
-              console.log("Back 3");
+              console.log("Back 2-E");
               //console.log(respError);
               const Error = {
                 status: "error",
@@ -100,11 +126,13 @@ const CreateUser = async (req, res) => {
               };
               res.status(respError.statusCode).json(Error);
             }
+            //Get data for created employee-------------ENDS
+            //
           } else if (respAdd.status == "error") {
             console.log("Error");
             const err = respAdd.message;
             const respError = await errorHelper(err);
-            console.log("Back 2");
+            console.log("Back 1-E");
             //  console.log(respError);
             const Error = {
               status: "error",
@@ -113,7 +141,7 @@ const CreateUser = async (req, res) => {
             res.status(respError.statusCode).json(Error);
           }
         }
-        await createUser(filteredDataUser);
+        await createEmployee(filteredData);
         //STEP_1---createUser and get data----------------ENDS
         //------------------------------------------------------
         //
@@ -127,258 +155,80 @@ const CreateUser = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-// ACCOUNT VERIFICATION CODE++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-//-------------------------------------------------------------------------------------------------------------
-//
-//Get a single user by id --DONE-------------------------------------------------------------------------------
-//
-const GetUserById = async (req, res) => {
-  console.log("Inside GetUserById");
-  //console.log(req.body.postID);
-  const encryptedid = req.params.id;
-  const userId = decodetheid(encryptedid);
-  // console.log(userId);
-  if (userId && userId > 0) {
+//GetEmployees --DONE-------------------------------------------------------------------------------
+const GetEmployees = async (req, res) => {
+  console.log("inside GetEmployees");
+  //
+  const employeeId = req.params.id;
+  // console.log(employeeId);
+  // console.log(typeof employeeId); //string
+  //
+  async function getDataFunc(configID) {
+    console.log("Inside getDataFunc");
     //
-    var users_data = {};
-    var users_data_resp = {};
+    var allData = 0;
+    var idData = 0;
+    var view_payload;
+    configID == "all" ? (allData = 1) : (idData = 1);
     //
-    var users_roles_data = {};
-    var users_roles_data_resp = {};
-    //
-    //STEP-1 NOW GET Users Details from users table---++++++++++++++starts
-    //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //
-    console.log("STEP-1 STARTS");
-    async function getUsersData(userID) {
-      console.log("Inside getUsersData");
-      return new Promise((resolve, reject) => {
-        //   console.log(userID);
-        //
-        const sql = con.query(
-          //mine
-          //"SELECT id, CONCAT(first_Name, ' ', last_Name) AS fullname, roles, phone, email,  address_line1, address_line2, city, state, country, postal_code, active,  date_of_birth, gender, created_at from users WHERE id=?",
-          //sir
-          // "SELECT users.id, users.first_Name, users.last_Name, role.title as roles, users.phone, users.email,  users.address_line1, users.address_line2, users.city, users.state, users.country, users.postal_code, users.active, users.date_of_birth, users.gender, users.created_at, users.updated_at, users.verification_code from users LEFT JOIN users_role ON users_role.users_id = users.id LEFT JOIN role ON users_role.role = role.id WHERE users.id=?",
-          //mine
-          "SELECT u.id, u.first_Name, u.last_Name, u.nick_name, u.description, u.phone, u.phone_verify, u.email, u.email_verify, u.current_store, u.address_line1, u.address_line2, u.city, u.state, u.country, u.postal_code,  CONCAT('" +
-            domainpath +
-            "', u.image) as image, u.gender, u.date_of_birth, u.employee_id, u.active FROM users as u WHERE u.id=?", //DATE_FORMAT(u.date_of_birth, '%d-%m-%Y') AS date_of_birth, u.password,
-          [userID],
-          (err, response) => {
-            if (!err) {
-              //console.log(response);
-              if (response && response.length > 0) {
-                //
-                //removing row data packet-------------STARTS
-                var resultArray = Object.values(
-                  JSON.parse(JSON.stringify(response))
-                );
-                // console.log(resultArray);
-                //removing row data packet-------------ENDS
-                //
-                //Enc Order id -- STARTS
-                let result1 = resultArray.map((item) => {
-                  const decOrderId = item.id;
-                  item.id = encrypttheid(decOrderId);
-                  return item;
-                });
-                //Enc Order id -- ENDS
-                //
-                // const Response = {
-                //   status: "success",
-                //   responsedata: { user: result1 },
-                // };
-                // res.status(200).json(Response);
-                users_data = result1; //data into global variable
-                //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-                resolve({
-                  result: 1,
-                });
-              } else {
-                console.log("STEP_1 ERROR");
-                console.log("SQL ERROR - No data Got - Sql Query - Get user");
-                // const Error = {
-                //   status: "error",
-                //   message: "No Data",
-                // };
-                // res.status(204).json(Response);
-                reject({
-                  result: 0,
-                });
-              }
-            } else {
-              console.log("STEP_1 ERROR");
-              console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-              console.log("Get User sql error");
-              console.log(err);
-              // const Error = {
-              //   status: "error",
-              //   message: "Server Error",
-              // };
-              // res.status(400).json(Error);
-              reject({
-                result: 0,
-              });
-            }
-          }
-        );
-        console.log(sql.sql);
-        //
-      }).catch((error) => console.log(error.message));
+    if (allData == 1) {
+      view_payload = {
+        table_name: table_name,
+        dataToGet:
+          "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, employee_id, active, description",
+      };
+    } else if (idData == 1) {
+      view_payload = {
+        table_name: table_name,
+        dataToGet:
+          "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, employee_id, active, description",
+        query_field: "id",
+        query_value: configID,
+      };
     }
-    users_data_resp = await getUsersData(userId);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    // console.log(users_data_resp);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    //STEP-1 NOW GET Users Details from users table---++++++++++++++ends
-    //STEP++++++++++++++++ENDS++++++++++++++++++++++++++
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // console.log(view_payload);
     //
-    if (
-      users_data_resp &&
-      users_data_resp !== undefined &&
-      Object.keys(users_data_resp).length != 0 &&
-      users_data_resp.result > 0
-    ) {
-      console.log("STEP-1 DONE SUCCESSFULLY");
-      console.log("STEP-2 STARTS");
-      //STEP-2 NOW GET Users ROLES from users_role table---++++++++++++++starts
-      //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //
-      async function getUsersRolesData(userID) {
-        console.log("Inside getUsersRolesData");
-        return new Promise((resolve, reject) => {
-          //   console.log(userID);
-          //
-          const sql = con.query(
-            "SELECT ur.id as users_role_id, ur.store_type as store_type_id, st.name as store_type_name, ur.store_id, s.name as store_name, ur.role as role_id, r.title as role_name, ur.active FROM users_role as ur LEFT JOIN store_type as st ON st.id=ur.store_type LEFT JOIN stores as s ON s.id=ur.store_id LEFT JOIN role as r ON r.id=ur.role WHERE ur.trash = 0 AND ur.users_id=?",
-            [userID],
-            (err, response) => {
-              if (!err) {
-                //console.log(response);
-                if (response && response.length > 0) {
-                  //
-                  //removing row data packet-------------STARTS
-                  var resultArray = Object.values(
-                    JSON.parse(JSON.stringify(response))
-                  );
-                  // console.log(resultArray);
-                  //removing row data packet-------------ENDS
-                  //
-                  users_roles_data = resultArray; //data into global variable
-                  //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-                  resolve({
-                    result: 1,
-                  });
-                } else {
-                  console.log("STEP_2 ERROR");
-                  console.log(
-                    "SQL ERROR - No data Got - Sql Query - Get user ROles"
-                  );
-                  // const Error = {
-                  //   status: "error",
-                  //   message: "No Data",
-                  // };
-                  // res.status(204).json(Response);
-                  reject({
-                    result: 0,
-                  });
-                }
-              } else {
-                console.log("STEP_2 ERROR");
-                console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                console.log("Get User ROles - sql error");
-                console.log(err);
-                // const Error = {
-                //   status: "error",
-                //   message: "Server Error",
-                // };
-                // res.status(400).json(Error);
-                reject({
-                  result: 0,
-                });
-              }
-            }
-          );
-          console.log(sql.sql);
-          //
-        }).catch((error) => console.log(error.message));
-      }
-      users_roles_data_resp = await getUsersRolesData(userId);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      // console.log(users_roles_data_resp);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      //STEP-2 NOW GET Users ROLES from users_role table---++++++++++++++ends
-      //STEP++++++++++++++++ENDS++++++++++++++++++++++++++
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //
-      if (
-        users_roles_data_resp &&
-        users_roles_data_resp !== undefined &&
-        Object.keys(users_roles_data_resp).length != 0 &&
-        users_roles_data_resp.result > 0
-      ) {
-        console.log("STEP-2 DONE SUCCESSFULLY");
-        console.log("STEP-3 STARTS");
-        //DATA MATCH N COMPILE -------------------STARTS
-        console.log(users_data);
-        console.log(users_roles_data);
-        users_data[0].roles = users_roles_data;
-        console.log(users_data);
-        const Response = {
-          status: "success",
-          responsedata: { user: users_data },
-        };
-        res.status(200).json(Response);
-        //DATA MATCH N COMPILE -------------------ENDS
-        console.log("STEP-3 ENDS");
-      } else {
-        console.log("STEP 2 Error");
-        const Error = {
-          status: "error",
-          message: "Server Error",
-        };
-        res.status(400).json(Error);
-      }
-    } else {
-      console.log("STEP 1 Error");
+    const respView = await view(view_payload);
+    console.log("Back 1");
+    //console.log(respView);
+    if (respView.status == "success") {
+      console.log("Success employee Data Got");
+      const Response = {
+        message: respView.status,
+        responsedata: { employee: respView.data },
+      };
+      res.status(201).json(Response);
+    } else if (respView.status == "error") {
+      console.log("Error");
+      const err = respView.message;
+      const respError = await errorHelper(err);
+      console.log("Back 1-E");
+      console.log(respError);
       const Error = {
         status: "error",
-        message: "Server Error",
+        message: respError.message,
       };
-      res.status(400).json(Error);
+      res.status(respError.statusCode).json(Error);
     }
-    //
-  } else {
-    const Error = { status: "error", message: "Invalid Details" };
-    res.status(400).json(Error);
   }
+  await getDataFunc(employeeId);
+  //
 };
 //-----------------------------------------------------------------------------------------------------------
 //
-//-------------------------------------------------------------------------------------------------------------
-//
-// UPDATE a user  in database table --users -----------------------------------------------------------------
-const UpdateUser = async (req, res) => {
+// UpdateEmployee in database table --employees -----------------------------------------------------------------
+const UpdateEmployee = async (req, res) => {
   console.log("Inside UpdateUser");
   // console.log(req.body);
   //
   const data = req.body;
   //console.log(data);
   //
-  var dataUserTable = {};
+  var dataEmployeeTable = {};
   //handling active---------STARTS
   if (data.hasOwnProperty("active") && (data.active == 0 || data.active == 1)) {
     console.log("Active field exists");
-    dataUserTable.active = data.active;
+    dataEmployeeTable.active = data.active;
     delete data.active;
   }
   //handling active---------_ENDS
@@ -480,72 +330,72 @@ const UpdateUser = async (req, res) => {
     //--------------------------------------------------
     //
     if (filteredData.hasOwnProperty("first_Name")) {
-      dataUserTable.first_Name = filteredData.first_Name;
+      dataEmployeeTable.first_Name = filteredData.first_Name;
     }
     if (filteredData.hasOwnProperty("last_Name")) {
-      dataUserTable.last_Name = filteredData.last_Name;
+      dataEmployeeTable.last_Name = filteredData.last_Name;
     }
     if (filteredData.hasOwnProperty("nick_name")) {
-      dataUserTable.nick_name = filteredData.nick_name;
+      dataEmployeeTable.nick_name = filteredData.nick_name;
     }
     if (filteredData.hasOwnProperty("phone")) {
-      dataUserTable.phone = filteredData.phone;
+      dataEmployeeTable.phone = filteredData.phone;
     }
     if (filteredData.hasOwnProperty("phone_verify")) {
-      dataUserTable.phone_verify = filteredData.phone_verify;
+      dataEmployeeTable.phone_verify = filteredData.phone_verify;
     }
     if (filteredData.hasOwnProperty("email")) {
-      dataUserTable.email = filteredData.email;
+      dataEmployeeTable.email = filteredData.email;
     }
     if (filteredData.hasOwnProperty("email_verify")) {
-      dataUserTable.email_verify = filteredData.email_verify;
+      dataEmployeeTable.email_verify = filteredData.email_verify;
     }
     if (filteredData.hasOwnProperty("current_store")) {
-      dataUserTable.current_store = filteredData.current_store;
+      dataEmployeeTable.current_store = filteredData.current_store;
     }
     if (filteredData.hasOwnProperty("verification_code")) {
-      dataUserTable.verification_code = filteredData.verification_code;
+      dataEmployeeTable.verification_code = filteredData.verification_code;
     }
     if (filteredData.hasOwnProperty("address_line1")) {
-      dataUserTable.address_line1 = filteredData.address_line1;
+      dataEmployeeTable.address_line1 = filteredData.address_line1;
     }
     if (filteredData.hasOwnProperty("address_line2")) {
-      dataUserTable.address_line2 = filteredData.address_line2;
+      dataEmployeeTable.address_line2 = filteredData.address_line2;
     }
     if (filteredData.hasOwnProperty("city")) {
-      dataUserTable.city = filteredData.city;
+      dataEmployeeTable.city = filteredData.city;
     }
     if (filteredData.hasOwnProperty("state")) {
-      dataUserTable.state = filteredData.state;
+      dataEmployeeTable.state = filteredData.state;
     }
     if (filteredData.hasOwnProperty("country")) {
-      dataUserTable.country = filteredData.country;
+      dataEmployeeTable.country = filteredData.country;
     }
     if (filteredData.hasOwnProperty("postal_code")) {
-      dataUserTable.postal_code = filteredData.postal_code;
+      dataEmployeeTable.postal_code = filteredData.postal_code;
     }
     if (filteredData.hasOwnProperty("image")) {
-      dataUserTable.image = filteredData.image;
+      dataEmployeeTable.image = filteredData.image;
     }
     if (filteredData.hasOwnProperty("gender")) {
-      dataUserTable.gender = filteredData.gender;
+      dataEmployeeTable.gender = filteredData.gender;
     }
     if (filteredData.hasOwnProperty("date_of_birth")) {
-      dataUserTable.date_of_birth = filteredData.date_of_birth;
+      dataEmployeeTable.date_of_birth = filteredData.date_of_birth;
     }
     if (filteredData.hasOwnProperty("employee_id")) {
-      dataUserTable.employee_id = filteredData.employee_id;
+      dataEmployeeTable.employee_id = filteredData.employee_id;
     }
     if (filteredData.hasOwnProperty("ipaddress")) {
-      dataUserTable.ipaddress = filteredData.ipaddress;
+      dataEmployeeTable.ipaddress = filteredData.ipaddress;
     }
     if (filteredData.hasOwnProperty("slug")) {
-      dataUserTable.slug = filteredData.slug;
+      dataEmployeeTable.slug = filteredData.slug;
     }
     if (filteredData.hasOwnProperty("description")) {
-      dataUserTable.description = filteredData.description;
+      dataEmployeeTable.description = filteredData.description;
     }
-    // console.log(dataUserTable);
+    // console.log(dataEmployeeTable);
     //--------------------------------------------------
     //User table data gather --------------------ENDS---------------------------
     //
@@ -601,7 +451,7 @@ const UpdateUser = async (req, res) => {
         //
       }).catch((error) => console.log(error.message));
     }
-    user_data_resp = await updateUser(userId, dataUserTable);
+    user_data_resp = await updateUser(userId, dataEmployeeTable);
     console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
     console.log(user_data_resp);
     console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
@@ -721,37 +571,51 @@ const UpdateUser = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-// DELETE a user in database table --users--------------------------------------------------
-const DeleteUser = async (req, res) => {
-  console.log("Inside Delete User");
-  //console.log(req);
+// DeleteEmployee in database table --employees--------------------------------------------------
+const DeleteEmployee = async (req, res) => {
+  console.log("Inside DeleteEmployee");
+  const employeeId = req.params.id;
+  // console.log(employeeId);
   //
-  // const encryptedid = req.params.id;
-  // const userId = decodetheid(encryptedid);
-  const userId = req.params.id;
-  // console.log(userId);
-  //
-  //STEP_1---deleteUser----------------STARTS
-  //------------------------------------------------------
-  async function deleteUser(deleteID) {
-    console.log("Inside deleteUser");
+  async function deleteConfigFunc(deleteID) {
+    console.log("Inside deleteEmployee");
     //   console.log(deleteID);
+    //----------------------1----------------------------------------------
+    // let update_payload = {
+    //   table_name: table_name,
+    //   query_field: "id",
+    //   query_value: deleteID,
+    // };
+    //console.log(update_payload);
+    // const respDelete = await deleteHelper(update_payload);
+    //----------------------1----------------------------------------------
     //
-    const respDelete = await deleteHelper(table_name, deleteID);
+    //-------------------2--------------------------------------------------
+    let delete_payload = {
+      table_name: table_name,
+      query_field: "id",
+      query_value: deleteID,
+      dataToSave: {
+        active: 0,
+        trash: 1,
+      },
+    };
+    //console.log(delete_payload);
+    const respDelete = await deleteTrashHelper(delete_payload);
     console.log("Back 1");
     //console.log(respDelete);
     if (respDelete.status == "success") {
-      console.log("Success User Deleted");
+      console.log("Success Employee Trash Deleted");
       const Response = {
         status: "success",
-        message: "User Deleted Successfully",
+        message: "Employee Deleted Successfully",
       };
       res.status(201).json(Response);
     } else if (respDelete.status == "error") {
       console.log("Error");
       const err = respDelete.message;
       const respError = await errorHelper(err);
-      console.log("Back 2");
+      console.log("Back 1-E");
       //  console.log(respError);
       const Error = {
         status: "error",
@@ -759,145 +623,17 @@ const DeleteUser = async (req, res) => {
       };
       res.status(respError.statusCode).json(Error);
     }
+    //-------------------2--------------------------------------------------
   }
-  await deleteUser(userId);
-  //STEP_1---deleteUser----------------ENDS
-  //------------------------------------------------------
+  await deleteConfigFunc(employeeId);
   //
-};
-//-----------------------------------------------------------------------------------------------------------------
-//
-const AccountVerificationCode = async (req, res) => {
-  console.log("inside AccountVerificationCode send email");
-  //console.log(req);
-  //
-  const encryptedid = req.params.id;
-  const userIdFP = decodetheid(encryptedid); //decrypted id now
-  // console.log(userIdFP);
-  //
-  con.query(
-    //"SELECT id, first_Name, last_Name, phone, email FROM users WHERE id=?",
-    "SELECT * from users WHERE id=?",
-    [userIdFP],
-    async (err, response) => {
-      if (!err) {
-        if (response && response.length > 0) {
-          var user_data_comp;
-          //array is defined and is not empty
-          //console.log(response);
-          //
-          //removing row data packet-------------STARTS
-          var resultArray = Object.values(JSON.parse(JSON.stringify(response)));
-          //  console.log(resultArray);
-          //removing row data packet-------------ENDS
-          //
-          user_data_comp = resultArray;
-          let resp = await UserAccountVerificationCodeEmail(user_data_comp);
-          console.log(resp);
-          if (resp.status == "success") {
-            console.log("BACK");
-            console.log("Email Sent Successfully");
-            res.status(200).json(resp);
-          } else if (resp.status == "error") {
-            console.log("BACK");
-            console.log("Email Sending Failed");
-            res.status(400).json(resp);
-          }
-        } else {
-          console.log("ERROR");
-          console.log("SQL ERROR - No data Got - Sql Query - User");
-          const Error = {
-            status: "error",
-            message: "No Data",
-          };
-          res.status(204).json(Response);
-        }
-
-        //send email starts-----------------------------------------
-        // async function check() {
-        //   // console.log("before waiting");
-        //   //await testAsync();
-        //   let resp = await sendemail(response);
-        //   //console.log(resp);
-        //   // console.log("After waiting");
-        // }
-        // check();
-        //send email ends -----------------------------------------
-      } else {
-        console.log(err);
-        const Error = { status: "error", message: "Server Error" };
-        res.status(400).json(Error);
-      }
-    }
-  );
 };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
-const VerificationCode = async (req, res) => {
-  console.log("inside VerificationCode");
-  //console.log(req);
-  //
-  const encryptedid = req.params.id;
-  const userIdFP = decodetheid(encryptedid); //decrypted id now
-  // console.log(userIdFP);
-  //
-  con.query(
-    //"SELECT id, first_Name, last_Name, phone, email FROM users WHERE id=?",
-    "SELECT * from users WHERE id=?",
-    [userIdFP],
-    async (err, response) => {
-      if (!err) {
-        if (response && response.length > 0) {
-          var user_data_comp;
-          //array is defined and is not empty
-          //console.log(response);
-          //
-          //removing row data packet-------------STARTS
-          var resultArray = Object.values(JSON.parse(JSON.stringify(response)));
-          //  console.log(resultArray);
-          //removing row data packet-------------ENDS
-          //
-          user_data_comp = resultArray;
-          let resp = await VerificationCodeEmail(user_data_comp);
-          console.log(resp);
-          if (resp.status == "success") {
-            console.log("BACK");
-            console.log("Email Sent Successfully");
-            res.status(200).json(resp);
-          } else if (resp.status == "error") {
-            console.log("BACK");
-            console.log("Email Sending Failed");
-            res.status(400).json(resp);
-          }
-        } else {
-          console.log("ERROR");
-          console.log("SQL ERROR - No data Got - Sql Query - User");
-          const Error = {
-            status: "error",
-            message: "No Data",
-          };
-          res.status(204).json(Response);
-        }
-
-        //send email starts-----------------------------------------
-        // async function check() {
-        //   // console.log("before waiting");
-        //   //await testAsync();
-        //   let resp = await sendemail(response);
-        //   //console.log(resp);
-        //   // console.log("After waiting");
-        // }
-        // check();
-        //send email ends -----------------------------------------
-      } else {
-        console.log(err);
-        const Error = { status: "error", message: "Server Error" };
-        res.status(400).json(Error);
-      }
-    }
-  );
-};
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//
+//
+//
+//
 //
 // ForgotPassword++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const ForgotPassword = async (req, res) => {
@@ -1105,7 +841,7 @@ const VerifyOtp = async (req, res) => {
 
 //-----------------------------------------------------------------------------------------------------------------
 //
-// Add a user  into database table --users-DONE--------------------------------------------------------------
+// PasswordUpdate-----DONE--------------------------------------------------------------
 const PasswordUpdate = async (req, res) => {
   console.log("inside PasswordUpdate");
   //
@@ -1278,15 +1014,12 @@ const PasswordUpdate = async (req, res) => {
 };
 //
 module.exports = {
-  CreateUser,
-  GetUserById,
-  UpdateUser,
-  DeleteUser,
+  CreateEmployee, //done
+  GetEmployees, //done
+  UpdateEmployee,
+  DeleteEmployee, //done
   //
-  AccountVerificationCode,
-  VerificationCode,
   ForgotPassword,
-  //
   VerifyOtp,
   PasswordUpdate,
 };

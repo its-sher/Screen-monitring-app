@@ -39,8 +39,8 @@ app.get("/", (req, res) => {
 const loginRouter = require("./routes/Login");
 app.use("/login", GenuineToken, loginRouter);
 
-const userRouter = require("./routes/User");
-app.use("/user", GenuineToken, userRouter);
+const userRouter = require("./routes/Employee");
+app.use("/employee", GenuineToken, userRouter);
 
 const accesstokenRouter = require("./routes/AccessToken");
 app.use("/accesstoken", GenuineToken, accesstokenRouter);

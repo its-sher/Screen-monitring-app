@@ -2,11 +2,10 @@ const con = require("../models/db");
 const bcrypt = require("bcrypt");
 const { usertokencreation } = require("../helpers/user-token-creation");
 const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
-console.log("inside Login controller");
+console.log("Inside Login controller");
 const table_name = "employees";
-
 //
-const LoginUser = async (req, res) => {
+const Login = async (req, res) => {
   console.log("Login User");
   //console.log(req.session);
   //console.log("Node-inside login ");
@@ -33,7 +32,6 @@ const LoginUser = async (req, res) => {
     (checkemailorphone == "email" || checkemailorphone == "phone") &&
     checkemailorphone.length > 0
   ) {
-    //9-bcz phone num is min 10digits and email is also more than 9 digits
     // console.log(phoneoremailvalue);
     //check for user
     // const sql = con.query(
@@ -204,235 +202,6 @@ const LoginUser = async (req, res) => {
   //
 };
 //-------------------------------------------------------------------------------------------------------------
-// Check CheckIfUserLoggedin----- if session exists then logged in true--------------------------------------------------------------
-const CheckIfUserLoggedIn = async (req, res) => {
-  console.log("11--inside check user logged in or not ");
-  // console.log(req.session);
-  if (req.session.users_id) {
-    console.log("SESSION EXISTS");
-    //
-    //get user id from session+decode+int id
-    const userid = req.session.users_id;
-    const intuserid = decodetheid(userid);
-    //
-    //get session id from session
-    const sessionid = req.session.id;
-    //console.log("session id" + sessionid);
-    //
-    //get accesstoken from session
-    const accesstoken = req.session.accesstoken;
-    //console.log(accesstoken);
-    //
-    //const sql = con.query(
-    const sql = con.query(
-      "SELECT * from sessions WHERE (users_id=? AND session_id=? AND access_token=?)",
-      [intuserid, sessionid, accesstoken],
-      async (err, response) => {
-        //console.log("query" + response);
-        if (!err) {
-          if (response && response.length > 0) {
-            console.log("Get Session Record Successful");
-            //  console.log(response);
-            //
-            //removing row data packet-------------STARTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            var resultArray = Object.values(
-              JSON.parse(JSON.stringify(response))
-            );
-            // console.log(resultArray);
-            //removing row data packet-------------ENDS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //Now Get Data into Response--starts))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
-            //
-            //--1-----get data from session record -- data variable-------------starts
-            //
-            const data_db_json_string = resultArray[0].data;
-            //  console.log(data_db_json_string);
-            //--------------------------------------------------------
-            //
-            const sessdata = JSON.parse(data_db_json_string);
-            //   console.log(sessdata);
-            //
-            //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-            var db_globalVariablesData;
-            var global_variables_data_resp = {};
-            //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-            //
-            //STEP-1 -- Get Global Variables ---STARTS+++++++++++++++++
-            //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            async function getglobalvariables() {
-              console.log("Inside getglobalvariables");
-              return new Promise((resolve, reject) => {
-                //
-                const sql = con.query(
-                  "SELECT * FROM `global_variables`",
-                  async (err, result) => {
-                    if (!err) {
-                      //  console.log(result);
-                      if (result && result.length > 0) {
-                        //console.log(result);
-                        console.log("Data is there in global variables");
-                        //
-                        //removing row data packet-------------STARTS
-                        var resultGlobalData = Object.values(
-                          JSON.parse(JSON.stringify(result))
-                        );
-                        //  console.log(resultGlobalData);
-                        //removing row data packet-------------ENDS
-                        //
-                        db_globalVariablesData = resultGlobalData;
-                        //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-                        resolve({
-                          result: 1,
-                        });
-                      } else {
-                        console.log("No data in global variables");
-                        // const Error = {
-                        //   status: "error",
-                        //   message: "Server Error",
-                        // };
-                        // res.status(204).json(Error);
-                        reject({
-                          result: 0,
-                        });
-                      }
-                    } else {
-                      console.log(err);
-                      // const Error = { status: "error", message: "Server Error" };
-                      // res.status(400).json(Error);
-                      reject({
-                        result: 0,
-                      });
-                    }
-                  }
-                );
-                //console.log(sql);
-              }).catch((error) => console.log(error.message));
-            }
-            global_variables_data_resp = await getglobalvariables();
-            console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-            console.log(global_variables_data_resp);
-            console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-            //STEP++++++++++++++++COMPLETES++++++++++++++++++++++++++
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //STEP-1 -- Get Global Variables ---ENDS+++++++++++++++++
-            //
-            if (
-              global_variables_data_resp &&
-              global_variables_data_resp !== undefined &&
-              Object.keys(global_variables_data_resp).length != 0 &&
-              global_variables_data_resp.result > 0
-            ) {
-              console.log("Get Global Variables Data Success");
-              //
-              const Response = {
-                login: true,
-                sessdata,
-                global: db_globalVariablesData,
-              };
-              res.status(200).json(Response);
-              //
-            } else {
-              console.log("Get Global Variables Data Error");
-              const Error = {
-                status: "error",
-                message: "Server Error",
-              };
-              res.status(400).json(Error);
-            }
-
-            //Now Get Data into Response--ends))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
-            //
-          } else {
-            console.log("This case should not WORK");
-            console.log("No Session Data");
-            const Error = {
-              status: "error",
-              message: "No Data",
-            };
-            res.status(204).json(Error);
-          }
-        } else {
-          console.log(err);
-          const Error = {
-            status: "error",
-            message: "Server Error",
-          };
-          res.status(400).json(Error);
-        }
-      }
-    );
-    console.log(sql.sql);
-  } else {
-    console.log("not logged in");
-    res.clearCookie("logedIn");
-    res.clearCookie("sid");
-    res.send({ login: false });
-  }
-};
-//-------------------------------------------------------------------------------------------------------------
-// Check GetUserLoggedinId----- if session exists then send encrypted id--------------------------------------------------------------
-const GetUserLoggedinId = (req, res) => {
-  console.log("11--inside check user logged in to get id and session id");
-  console.log(req.session);
-  if (req.session.users_id) {
-    //get user id from session+decode+int id
-    const userid = req.session.users_id;
-    const intuserid = decodetheid(userid);
-    //get session id from session
-    const sessionid = req.session.id;
-    //console.log("session id" + sessionid);
-    //get accesstoken from session
-    const accesstoken = req.session.accesstoken;
-    //console.log(accesstoken);
-    //console.log(req.session.id);
-
-    //const sql = con.query(
-    con.query(
-      "SELECT * from sessions WHERE (users_id=? AND session_id=? AND access_token=?)",
-      [intuserid, sessionid, accesstoken],
-      (err, response) => {
-        console.log("query" + response);
-        if (!err) {
-          if (response && response.length) {
-            //console.log("ddddddddddddddddddddd");
-            //console.log(response);
-            con.query(
-              "SELECT id from users WHERE id=?",
-              [intuserid],
-              (err, resp) => {
-                //ENCODE ID - userid
-                const userId1 = resp[0].id;
-                const encodedid = encrypttheid(userId1);
-                //ends
-                //console.log(resp[0].roles);
-                //console.log(req.header);
-                console.log("sending id of logged in user");
-
-                res.status(200).send({ user: encodedid, session: sessionid });
-              }
-            );
-          } else {
-            console.log("Not Logged in");
-            const Error = { status: "error", message: "Server Error" };
-            res.status(400).json(Error);
-            //res.send(Error);
-          }
-        } else {
-          console.log(err);
-          const Error = { status: "error", message: "Server Error" };
-          res.status(400).json(Error);
-        }
-      }
-    );
-    //console.log(sql.sql);
-  } else {
-    console.log("not logged in");
-    res.status(400).send();
-  }
-};
-//-------------------------------------------------------------------------------------------------------------
 //Logout User
 const Logout = (req, res) => {
   console.log("inside logout node");
@@ -459,13 +228,8 @@ const Logout = (req, res) => {
   // });
 };
 //-------------------------------------------------------------------------------------------------------------
-//USER LOGIN ___________________________________________________ENDS
-//
-// Add a user  into database table --users-DONE--------------------------------------------------------------
 //
 module.exports = {
-  LoginUser,
-  CheckIfUserLoggedIn,
-  GetUserLoggedinId,
+  Login,
   Logout,
 };
