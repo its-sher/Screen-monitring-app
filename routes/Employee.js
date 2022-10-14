@@ -4,13 +4,11 @@ const userController = require("../controllers/employeeController");
 const { checkemployee, checkemployeealready } = require("../models/employee");
 console.log("Inside Employee.js routes");
 //
-router.post("/", checkemployeealready, userController.CreateEmployee);
+router.post("/", userController.CreateEmployee);
 router.get("/:id", userController.GetEmployees);
-
 router.put(
   "/:id",
-  checkemployee,
-  checkemployeealready,
+  //checkemployeealready,
   userController.UpdateEmployee
 );
 router.delete("/:id", checkemployee, userController.DeleteEmployee);
