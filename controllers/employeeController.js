@@ -3,11 +3,12 @@ const con = require("../models/db");
 const bcrypt = require("bcrypt");
 const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
 const {
-  add,
-  view,
-  errorHelper,
+  add_query,
+  view_query,
+  edit_query,
+  error_query,
   //deleteHelper,
-  deleteTrashHelper,
+  trash_query,
 } = require("../helpers/instructions");
 const {
   UserAccountVerificationCodeEmail,
@@ -24,7 +25,7 @@ const table_name = "employees";
 //
 //-------------------------------------------------------------------------------------------------------------
 //
-// Add a employee into database table --employees-DONE--------------------------------------------------------------
+// CreateEmployee ----------------------------------------------------------------
 const CreateEmployee = async (req, res) => {
   console.log("inside CreateEmployee");
   const dataEmployeeTable = req.body;
@@ -86,7 +87,7 @@ const CreateEmployee = async (req, res) => {
             dataToSave: saveData,
           };
           //console.log(add_payload);
-          const respAdd = await add(add_payload);
+          const respAdd = await add_query(add_payload);
           console.log("Back 1");
           //console.log(respAdd);
           if (respAdd.status == "success") {
@@ -101,7 +102,7 @@ const CreateEmployee = async (req, res) => {
               query_field: "id",
               query_value: id,
             };
-            const respView = await view(view_payload);
+            const respView = await view_query(view_payload);
             console.log("Back 2");
             //console.log(respView);
             if (respView.status == "success") {
@@ -117,7 +118,7 @@ const CreateEmployee = async (req, res) => {
             } else if (respView.status == "error") {
               console.log("Error");
               const err = respAdd.message;
-              const respError = await errorHelper(err);
+              const respError = await error_query(err);
               console.log("Back 2-E");
               //console.log(respError);
               const Error = {
@@ -131,7 +132,7 @@ const CreateEmployee = async (req, res) => {
           } else if (respAdd.status == "error") {
             console.log("Error");
             const err = respAdd.message;
-            const respError = await errorHelper(err);
+            const respError = await error_query(err);
             console.log("Back 1-E");
             //  console.log(respError);
             const Error = {
@@ -155,7 +156,7 @@ const CreateEmployee = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-//GetEmployees --DONE-------------------------------------------------------------------------------
+//GetEmployees ---------------------------------------------------------------------------------
 const GetEmployees = async (req, res) => {
   console.log("inside GetEmployees");
   //
@@ -171,6 +172,14 @@ const GetEmployees = async (req, res) => {
     var view_payload;
     configID == "all" ? (allData = 1) : (idData = 1);
     //
+    // password
+    // verification_code
+    // access_token
+    // refresh_token
+    // api_key
+    // trash
+    // created_at
+    // updated_at
     if (allData == 1) {
       view_payload = {
         table_name: table_name,
@@ -188,7 +197,7 @@ const GetEmployees = async (req, res) => {
     }
     // console.log(view_payload);
     //
-    const respView = await view(view_payload);
+    const respView = await view_query(view_payload);
     console.log("Back 1");
     //console.log(respView);
     if (respView.status == "success") {
@@ -197,11 +206,11 @@ const GetEmployees = async (req, res) => {
         message: respView.status,
         responsedata: { employee: respView.data },
       };
-      res.status(201).json(Response);
+      res.status(200).json(Response);
     } else if (respView.status == "error") {
       console.log("Error");
       const err = respView.message;
-      const respError = await errorHelper(err);
+      const respError = await error_query(err);
       console.log("Back 1-E");
       console.log(respError);
       const Error = {
@@ -216,362 +225,108 @@ const GetEmployees = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------
 //
-// UpdateEmployee in database table --employees -----------------------------------------------------------------
+// UpdateEmployee -----------------------------------------------------------------
 const UpdateEmployee = async (req, res) => {
-  console.log("Inside UpdateUser");
-  // console.log(req.body);
-  //
+  console.log("Inside UpdateEmployee");
   const data = req.body;
-  //console.log(data);
+  // console.log(data);
   //
-  var dataEmployeeTable = {};
-  //handling active---------STARTS
-  if (data.hasOwnProperty("active") && (data.active == 0 || data.active == 1)) {
-    console.log("Active field exists");
-    dataEmployeeTable.active = data.active;
-    delete data.active;
-  }
-  //handling active---------_ENDS
-  //
-  let filteredData = Object.fromEntries(
-    Object.entries(data).filter(([_, v]) => v != "null" && v != "" && v != null)
-  );
-  //console.log(filteredData);
-  const encryptedid = req.params.id;
-  const userId = decodetheid(encryptedid);
-  console.log(userId);
+  const employeeId = req.params.id;
+  //console.log(employeeId);
   //
   if (
-    userId &&
-    userId > 0 &&
-    filteredData &&
-    "key" in filteredData !== "undefined" &&
-    filteredData.roles &&
-    filteredData.roles.length > 0 &&
-    filteredData.roles[0].users_role_id &&
-    filteredData.roles[0].users_role_id > 0 &&
-    filteredData.roles[0].role_id &&
-    filteredData.roles[0].role_id > 0
+    data &&
+    data !== undefined &&
+    Object.keys(data).length != 0 &&
+    employeeId &&
+    employeeId > 0
   ) {
     console.log("Valid Details");
-    //------------------No Password being sent now-----------------------------
-    // //Password functionality STARTS-----------------------------------------
-    // var hashedPassword;
-    // var hash_data_resp = {};
-    // //
-    // if (
-    //   filteredData.hasOwnProperty("password") &&
-    //   filteredData.password.length > 0
-    // ) {
-    //   console.log("Password is sent to update");
-    //   const decPass = filteredData.password;
-    //   //STEP_1---hash password----------------STARTS
-    //   //------------------------------------------------------
-    //   async function hashPassword(password) {
-    //     console.log("Inside hashPassword");
-    //     return new Promise((resolve, reject) => {
-    //       //   console.log(password);
-    //       //
-    //       bcrypt.hash(password, 10, async (err, hash) => {
-    //         if (err) {
-    //           console.log(err);
-    //           const Error = { status: "error", message: "Server Error" };
-    //           res.status(400).json(Error);
-    //         } else {
-    //           //inserting new value into object key passwordHash
-    //           hashedPassword = hash;
-    //         }
-    //       });
-    //     }).catch((error) => console.log(error.message));
-    //   }
-    //   hash_data_resp = await hashPassword(decPass);
-    //   console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    //   console.log(hash_data_resp);
-    //   console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    //   //STEP_1---hash password----------------ENDS
-    //   //------------------------------------------------------
-    //   //
-    //   if (
-    //     hash_data_resp &&
-    //     hash_data_resp !== undefined &&
-    //     Object.keys(hash_data_resp).length != 0 &&
-    //     hash_data_resp.result > 0
-    //   ) {
-    //     console.log("STEP-1 DONE SUCCESSFULLY");
-    //     filteredData["password"] = hashedPassword;
-    //   } else {
-    //     console.log("STEP 1 Error");
-    //     const Error = {
-    //       status: "error",
-    //       message: "Server Error",
-    //     };
-    //     res.status(400).json(Error);
-    //   }
-    // } else {
-    //   console.log("No Password Proceed Further");
-    // }
-    // //Password functionality ENDS-----------------------------------------
+    var varUpdateDone = 0;
     //
-    //ROLE table data gather --------------------_STARTS++++++++++++++++++++++++
-    //--------------------------------------------------
-    var dataUserRoleTable = filteredData.roles[0];
-    //
-    dataUserRoleTable["role"] = dataUserRoleTable.role_id;
-    delete dataUserRoleTable.role_id;
-    //
-    const userRoleRow = dataUserRoleTable.users_role_id;
-    delete dataUserRoleTable.users_role_id;
-    //--------------------------------------------------
-    // console.log(dataUserRoleTable);
-    //--------------------------------------------------
-    //ROLE table data gather --------------------ENDS+++++++++++++++++++++++++++
-    //
-    //User table data gather --------------------_STARTS------------------------
-    //--------------------------------------------------
-    //
-    if (filteredData.hasOwnProperty("first_Name")) {
-      dataEmployeeTable.first_Name = filteredData.first_Name;
-    }
-    if (filteredData.hasOwnProperty("last_Name")) {
-      dataEmployeeTable.last_Name = filteredData.last_Name;
-    }
-    if (filteredData.hasOwnProperty("nick_name")) {
-      dataEmployeeTable.nick_name = filteredData.nick_name;
-    }
-    if (filteredData.hasOwnProperty("phone")) {
-      dataEmployeeTable.phone = filteredData.phone;
-    }
-    if (filteredData.hasOwnProperty("phone_verify")) {
-      dataEmployeeTable.phone_verify = filteredData.phone_verify;
-    }
-    if (filteredData.hasOwnProperty("email")) {
-      dataEmployeeTable.email = filteredData.email;
-    }
-    if (filteredData.hasOwnProperty("email_verify")) {
-      dataEmployeeTable.email_verify = filteredData.email_verify;
-    }
-    if (filteredData.hasOwnProperty("current_store")) {
-      dataEmployeeTable.current_store = filteredData.current_store;
-    }
-    if (filteredData.hasOwnProperty("verification_code")) {
-      dataEmployeeTable.verification_code = filteredData.verification_code;
-    }
-    if (filteredData.hasOwnProperty("address_line1")) {
-      dataEmployeeTable.address_line1 = filteredData.address_line1;
-    }
-    if (filteredData.hasOwnProperty("address_line2")) {
-      dataEmployeeTable.address_line2 = filteredData.address_line2;
-    }
-    if (filteredData.hasOwnProperty("city")) {
-      dataEmployeeTable.city = filteredData.city;
-    }
-    if (filteredData.hasOwnProperty("state")) {
-      dataEmployeeTable.state = filteredData.state;
-    }
-    if (filteredData.hasOwnProperty("country")) {
-      dataEmployeeTable.country = filteredData.country;
-    }
-    if (filteredData.hasOwnProperty("postal_code")) {
-      dataEmployeeTable.postal_code = filteredData.postal_code;
-    }
-    if (filteredData.hasOwnProperty("image")) {
-      dataEmployeeTable.image = filteredData.image;
-    }
-    if (filteredData.hasOwnProperty("gender")) {
-      dataEmployeeTable.gender = filteredData.gender;
-    }
-    if (filteredData.hasOwnProperty("date_of_birth")) {
-      dataEmployeeTable.date_of_birth = filteredData.date_of_birth;
-    }
-    if (filteredData.hasOwnProperty("employee_id")) {
-      dataEmployeeTable.employee_id = filteredData.employee_id;
-    }
-    if (filteredData.hasOwnProperty("ipaddress")) {
-      dataEmployeeTable.ipaddress = filteredData.ipaddress;
-    }
-    if (filteredData.hasOwnProperty("slug")) {
-      dataEmployeeTable.slug = filteredData.slug;
-    }
-    if (filteredData.hasOwnProperty("description")) {
-      dataEmployeeTable.description = filteredData.description;
-    }
-    // console.log(dataEmployeeTable);
-    //--------------------------------------------------
-    //User table data gather --------------------ENDS---------------------------
-    //
-    var user_data_resp = {};
-    var user_role_data_resp = {};
-    //
-    //STEP-1 Update User data ---++++++++++++++STARTS
-    //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //
-    async function updateUser(userID, saveData) {
-      console.log("Inside updateUser");
-      return new Promise((resolve, reject) => {
-        //   console.log(userID);
-        //   console.log(saveData);
+    //////////////////////////////////////////////////////////////////////////////////
+    async function updateDataFunc() {
+      let update_payload = {
+        table_name: table_name,
+        query_field: "id",
+        query_value: employeeId,
+        dataToSave: data,
+      };
+
+      //console.log(update_payload);
+      const respEdit = await edit_query(update_payload);
+      console.log("Back 1");
+      //console.log(respEdit);
+      if (respEdit.status == "success") {
+        console.log("Success Employee Data Updated");
+        varUpdateDone = 1;
         //
-        const sql = con.query(
-          "UPDATE users SET ? WHERE id=?",
-          [saveData, userID],
-          (err, result) => {
-            if (!err) {
-              console.log(result);
-              //   console.log(result.affectedRows);
-              if (result.affectedRows > 0) {
-                console.log("STEP-1 --> Updated user successful");
-                resolve({
-                  result: 1,
-                });
-              } else {
-                console.log("NOTHING UPDATED - case shouldn't work");
-                messageERR = "Invalid Details";
-                // const Error = { status: "error", message: "Invalid Details" };
-                // res.status(400).json(Error);
-                reject({
-                  result: 0,
-                });
-              }
-            } else {
-              console.log("UPDATE SLQ ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-              console.log(err);
-              messageERR = "Server Error";
-              //  const Error = { status: "error", message: "Server Error" };
-              //   res.status(400).json(Error);
-              reject({
-                result: 0,
-              });
-            }
-          }
-        );
-        // console.log(sql.sql);
-        //
-        //
-      }).catch((error) => console.log(error.message));
-    }
-    user_data_resp = await updateUser(userId, dataEmployeeTable);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    console.log(user_data_resp);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    //STEP-1 Update User data ---++++++++++++++ENDS
-    //STEP++++++++++++++++ENDS++++++++++++++++++++++++++
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //
-    if (
-      user_data_resp &&
-      user_data_resp !== undefined &&
-      Object.keys(user_data_resp).length != 0 &&
-      user_data_resp.result > 0
-    ) {
-      console.log("STEP-1 DONE SUCCESSFULLY");
-      console.log("STEP-2 STARTS");
-      //
-      //
-      //STEP-2 Update User Role data ---++++++++++++++STARTS
-      //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //
-      //    console.log(dataUserRoleTable);
-      async function updateUserRole(userRoleID, saveRoleData) {
-        console.log("Inside updateUserRole");
-        return new Promise((resolve, reject) => {
-          //   console.log(userRoleID);
-          //   console.log(saveRoleData);
-          //
-          const sql = con.query(
-            "UPDATE users_role SET ? WHERE id=?",
-            [saveRoleData, userRoleID],
-            (err, result) => {
-              if (!err) {
-                console.log(result);
-                //   console.log(result.affectedRows);
-                if (result.affectedRows > 0) {
-                  console.log("STEP-1 --> Updated users_role successful");
-                  resolve({
-                    result: 1,
-                  });
-                } else {
-                  console.log("NOTHING UPDATED - case shouldn't work");
-                  messageERR = "Invalid Details";
-                  // const Error = { status: "error", message: "Invalid Details" };
-                  // res.status(400).json(Error);
-                  reject({
-                    result: 0,
-                  });
-                }
-              } else {
-                console.log("UPDATE SLQ ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                console.log(err);
-                messageERR = "Server Error";
-                //  const Error = { status: "error", message: "Server Error" };
-                //   res.status(400).json(Error);
-                reject({
-                  result: 0,
-                });
-              }
-            }
-          );
-          // console.log(sql.sql);
-          //
-          //
-        }).catch((error) => console.log(error.message));
-      }
-      user_role_data_resp = await updateUserRole(
-        userRoleRow,
-        dataUserRoleTable
-      );
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      console.log(user_role_data_resp);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      //STEP-1 Update User Role data ---++++++++++++++ENDS
-      //STEP++++++++++++++++ENDS++++++++++++++++++++++++++
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //
-      if (
-        user_role_data_resp &&
-        user_role_data_resp !== undefined &&
-        Object.keys(user_role_data_resp).length != 0 &&
-        user_role_data_resp.result > 0
-      ) {
-        console.log("STEP-2 DONE SUCCESSFULLY");
-        console.log("Everything done");
-        const Response = {
-          status: "success",
-          message: "Updated Successfully",
-        };
-        res.status(200).json(Response);
-        //
-      } else {
-        console.log("STEP 2 Error");
+      } else if (respEdit.status == "error") {
+        console.log("Error");
+        const err = respEdit.message;
+        const respError = await error_query(err);
+        console.log("Back 1-E");
+        //  console.log(respError);
         const Error = {
           status: "error",
-          message: "Server Error",
+          message: respError.message,
         };
-        res.status(400).json(Error);
+        res.status(respError.statusCode).json(Error);
       }
-      //
-    } else {
-      console.log("STEP 1 Error");
-      const Error = {
-        status: "error",
-        message: "Server Error",
-      };
-      res.status(400).json(Error);
+      //STEP-1 Insert Ends===================================================
     }
+    await updateDataFunc();
+    //////////////////////////////////////////////////////////////////////////////////
+    //
+    if (varUpdateDone == 1) {
+      //////////////////////////////////////////////////////////////////////////////////
+      async function getDataFunc() {
+        console.log("Inside getDataFunc");
+        //
+        const view_payload = {
+          table_name: table_name,
+          dataToGet:
+            "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, employee_id, active, description",
+          query_field: "id",
+          query_value: employeeId,
+        };
+        // console.log(view_payload);
+        const respView = await view_query(view_payload);
+        console.log("Back 2");
+        //console.log(respView);
+        if (respView.status == "success") {
+          console.log("Success employee Data Got");
+          const Response = {
+            message: respView.status,
+            responsedata: { employee: respView.data },
+          };
+          res.status(200).json(Response);
+        } else if (respView.status == "error") {
+          console.log("Error");
+          const err = respView.message;
+          const respError = await error_query(err);
+          console.log("Back 2-E");
+          console.log(respError);
+          const Error = {
+            status: "error",
+            message: respError.message,
+          };
+          res.status(respError.statusCode).json(Error);
+        }
+      }
+      await getDataFunc();
+      //////////////////////////////////////////////////////////////////////////////////
+    }
+    //
   } else {
-    console.log("Invalid Details - update user");
+    console.log("Invalid Details");
     const Error = { status: "error", message: "Invalid Details" };
     res.status(400).json(Error);
   }
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-// DeleteEmployee in database table --employees--------------------------------------------------
+// DeleteEmployee (Trash)--------------------------------------------------
 const DeleteEmployee = async (req, res) => {
   console.log("Inside DeleteEmployee");
   const employeeId = req.params.id;
@@ -601,7 +356,7 @@ const DeleteEmployee = async (req, res) => {
       },
     };
     //console.log(delete_payload);
-    const respDelete = await deleteTrashHelper(delete_payload);
+    const respDelete = await trash_query(delete_payload);
     console.log("Back 1");
     //console.log(respDelete);
     if (respDelete.status == "success") {
@@ -614,7 +369,7 @@ const DeleteEmployee = async (req, res) => {
     } else if (respDelete.status == "error") {
       console.log("Error");
       const err = respDelete.message;
-      const respError = await errorHelper(err);
+      const respError = await error_query(err);
       console.log("Back 1-E");
       //  console.log(respError);
       const Error = {
