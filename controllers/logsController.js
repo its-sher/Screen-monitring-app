@@ -9,7 +9,7 @@ const {
   trash_query,
 } = require("../helpers/instructions");
 //
-console.log("Inside Log Controller");
+//console.log("Inside Log Controller");
 const table_name = "logs";
 //
 //-------------------------------------------------------------------------------------------------------------

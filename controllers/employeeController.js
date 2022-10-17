@@ -20,7 +20,7 @@ const {
 const { apikey } = require("../helpers/user-token-creation");
 //const domainpath = process.env.REACT_APP_DOMAIN_ENDPOINT;
 //
-console.log("Inside Employee Controller");
+//console.log("Inside Employee Controller");
 const table_name = "employees";
 //
 //-------------------------------------------------------------------------------------------------------------

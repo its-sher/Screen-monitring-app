@@ -14,7 +14,7 @@ const { base64encode, base64decode } = require("nodejs-base64");
 const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
 
 //
-console.log("Inside User controller");
+//console.log("Inside User controller");
 const table_name = "employees";
 //
 //-------------------------------------------------------------------------------------------------------------

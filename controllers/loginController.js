@@ -13,7 +13,7 @@ console.log("Inside Login controller");
 const table_name = "employees";
 //
 const Login = async (req, res) => {
-  console.log("Inside Login");
+  // console.log("Inside Login");
   const email = req.body.email;
   //console.log(email);
   const password = req.body.password; //password is password (hashed)

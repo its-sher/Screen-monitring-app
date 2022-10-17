@@ -8,7 +8,7 @@ const {
   trash_query,
 } = require("../helpers/instructions");
 //
-console.log("Inside Project Controller");
+//console.log("Inside Project Controller");
 const table_name = "project";
 //
 //-------------------------------------------------------------------------------------------------------------

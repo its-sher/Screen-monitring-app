@@ -8,7 +8,7 @@ const {
   trash_query,
 } = require("../helpers/instructions");
 //
-console.log("Inside Client Controller");
+//console.log("Inside Client Controller");
 const table_name = "client";
 //
 //-------------------------------------------------------------------------------------------------------------

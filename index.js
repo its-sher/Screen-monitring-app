@@ -30,7 +30,7 @@ app.use(
     credentials: true,
   })
 );
-console.log("Inside index.js");
+//console.log("Inside index.js");
 //
 app.get("/", (req, res) => {
   res.send("Hello You are Welcome to Screen Monitoring App");
