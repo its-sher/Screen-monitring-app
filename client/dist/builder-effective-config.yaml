@@ -1,0 +1,26 @@
+directories:
+  output: dist
+  buildResources: build
+mac:
+  publish:
+    provider: github
+    owner: Github Owner
+    repo: Repository Name
+    private: true
+    token: <stripped sensitive data>
+win:
+  publish:
+    provider: github
+    owner: Github Owner
+    repo: Repository Name
+    private: true
+    token: <stripped sensitive data>
+files:
+  - filter:
+      - build/**/*
+      - node_modules/**/*
+publish:
+  provider: github
+  private: true
+  owner: Github Owner
+electronVersion: 8.5.5

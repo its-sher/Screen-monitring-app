@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="style.js">
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+	<title>Teamlogger Login</title>
+</head>
+<body style="font-family: monospace;">
+	<a href="Timer.html">Timer Page</a>
+<div class="main-wrapper">
+	<div class="row headingrow">
+		<div class="refresh">
+			<i class="fa fa-refresh" aria-hidden="true"></i>
+		<button class="refresh"onClick="refreshPage()">Refresh</button>
+	</div>
+	<div class="report">
+		<button type="button" class="btn1"><i class="fa fa-file-o" aria-hidden="true"></i>My Report</button>
+		<a href="Login.html" class="Logout_btn"><i class="fa fa-sign-out" aria-hidden="true"></i>
+        Log out
+        </a>
+		</div>
+	</div>
+	<div class="row dashboard-text flex">
+		<!-- <div class="project_heading">Project</div> -->
+		<div class="Project_name"><h4>EZMOOV</h4></div>
+	</div>
+	<div class="row dashboard-text">
+		<select name="" id="input">
+		  <option value="volvo">Ezmoov</option>
+		  <option value="saab">HagglerPlanet</option>
+		  <option value="mercedes">Health4Objective</option>
+		</select>
+		<span class="plus_icon"><i class="fa fa-plus-circle" aria-hidden="true"></i><span class="add_task">Task</span>
+	</span>
+	</div>
+	</div>
+	<div class="row dashboard-text1">
+		<button type="button" onclick="Timer()"id="btn">Start Timer</button>
+		<table style="width:100%;padding: 5px 0 5px 0;">
+		  <tr>
+		    <td></td>
+		    <td class="greentext">Active</td>
+		    <td class="redtext">Idle</td>
+		     <td class="orangetext">Manual</td>
+		     <td>Total</td>
+		  </tr>
+		  <tr>
+		    <td style="font-size: 16px;font-weight: 800;">Day</td>
+		    <td class="green">00h 00m</td>
+		    <td class="red">00h 00m</td>
+		    <td class="orange">00h 00m</td>
+		    <td class="black">00h 00m</td>
+		  </tr>
+		    <tr>
+		    <td style="font-size: 16px;font-weight: 800;">Week</td>
+		    <td class="green">00h 00m</td>
+		    <td class="red">00h 00m</td>
+		    <td class="orange">00h 00m</td>
+		    <td class="black">00h 00m</td>
+		  </tr>
+		</table>
+	</div>
+	<div class="row dashboard-text1"> 
+	<input type="checkbox" id="scales" name="scales" checked>
+     Open the window automatically startup</div>
+     <div class="section2">
+	<div class="row tasktext">
+	<div class="recent_task">Recently Active Task</div>
+	</div>
+	<div class="row dashboard-text1">
+		<input type="text" placeholder="SEARCH TASKS" class="search_task">
+		<button class="search_icon" type="submit"><i class="fa fa-search"></i></button>
+	</div>
+	<div class="row tasktext1">
+		<div class="task-task">Default Task
+			<p>Ezmoov Dashboard</p>
+		</div>
+		<div class="i_icon"><span style="font-family: 'Playfair Display', serif;font-size: 20px;"><i class="fa fa-info-circle" aria-hidden="true"></i>
+		</span></div>
+		<div class="videobtn"><i class="fa fa-play"></i></div>
+		
+	</div>
+	<div class="row tasktext1">
+		<div class="task-task">Default Task
+			<p>Default Project</p>
+		</div>
+		<div class="i_icon"><span style="font-family: 'Playfair Display', serif;font-size: 20px;"><i class="fa fa-info-circle" aria-hidden="true"></i>
+		</span></div>
+		<div class="videobtn"><i class="fa fa-play"></i></div>
+		
+	</div>
+		<div class="row tasktext">
+		<span>Recent Sessions </span>
+	</div>
+	<div class="row recent">
+		<input type="text" class="recent_task"></div>
+	<!-- <div>
+		<textarea id="w3review" name="w3review" rows="4" cols="50"></textarea>
+	</div> -->
+
+</div>
+</div>
+<script>
+	function refreshPage(){
+    window.location.reload();
+} 
+</script>
+<script>
+
+	function Timer(){
+	var btn = document.getElementById("btn").value;
+	
+	{
+	window.location.href = "Timer.html"; // Redirecting to other page.
+	}};
+	</script>
+</body>
+</html>

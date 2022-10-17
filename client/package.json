@@ -1,0 +1,59 @@
+{
+  "name": "SCREEN MONITORING",
+  "version": "1.0.0",
+  "description": "Simple Calculator",
+  "main": "./app/app.js",
+  "scripts": {
+    "test": "react-scripts test",
+    "build": "react-scripts build",
+    "start": "electron .",
+    "start-electron": "set ELECTRON_START_URL=http://localhost:3000 && electron .",
+    "package": "electron-builder build --mac --win -c.extraMetadata.main=build/electron.js --publish never",
+    "package-win":"electron-packager . electron-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"electron-app\"",
+    "publish": "electron-builder build --mac --win --publish always",
+    "release": "electron-builder",
+    "dist": "electron-builder --publish always"
+  },
+  "author": "Arun",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron-forge/publisher-github": "^6.0.0-beta.67",
+    "electron": "^8.5.5",
+    "electron-installer-dmg": "^4.0.0",
+    "electron-packager": "^16.0.0",
+    "electron-winstaller": "^5.0.0",
+    "electron-wix-msi": "^4.0.0"
+  },
+  "build": {
+    "mac": {
+      "publish": {
+        "provider": "github",
+        "owner": "Github Owner",
+        "repo": "Repository Name",
+        "private": true,
+        "token": ""
+      }
+    },
+    "win": {
+      "publish": {
+        "provider": "github",
+        "owner": "Github Owner",
+        "repo": "Repository Name",
+        "private": true,
+        "token": ""
+      }
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "publish": {
+      "provider": "github",
+      "private": true,
+      "owner": "Github Owner"
+    }
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  }
+}
