@@ -18,7 +18,7 @@ const {
   UserPasswordChangedEmail,
 } = require("../helpers/employee");
 const { apikey } = require("../helpers/user-token-creation");
-const domainpath = process.env.REACT_APP_DOMAIN_ENDPOINT;
+//const domainpath = process.env.REACT_APP_DOMAIN_ENDPOINT;
 //
 console.log("Inside Employee Controller");
 const table_name = "employees";
@@ -43,7 +43,7 @@ const CreateEmployee = async (req, res) => {
     dataEmployeeTable.password &&
     dataEmployeeTable.password.length > 0
   ) {
-    console.log("dataEmployeeTable");
+    //console.log("dataEmployeeTable");
     //   console.log(dataEmployeeTable);
     //
     //STEP_1---Store data into table to create employee and return id----------------
@@ -91,7 +91,7 @@ const CreateEmployee = async (req, res) => {
           console.log("Back 1");
           //console.log(respAdd);
           if (respAdd.status == "success") {
-            console.log("Success Employee Created");
+            //console.log("Success Employee Created");
             const id = respAdd.id;
             //
             //Get data for created employee-------------STARTS
@@ -106,7 +106,7 @@ const CreateEmployee = async (req, res) => {
             console.log("Back 2");
             //console.log(respView);
             if (respView.status == "success") {
-              console.log("Success Employee Data Got");
+              //console.log("Success Employee Data Got");
               var finalData = respView.data;
               delete finalData.trash;
               delete finalData.password;
@@ -116,7 +116,7 @@ const CreateEmployee = async (req, res) => {
               };
               res.status(201).json(Response);
             } else if (respView.status == "error") {
-              console.log("Error");
+              //console.log("Error");
               const err = respAdd.message;
               const respError = await error_query(err);
               console.log("Back 2-E");
@@ -130,7 +130,7 @@ const CreateEmployee = async (req, res) => {
             //Get data for created employee-------------ENDS
             //
           } else if (respAdd.status == "error") {
-            console.log("Error");
+            //console.log("Error");
             const err = respAdd.message;
             const respError = await error_query(err);
             console.log("Back 1-E");
@@ -149,7 +149,7 @@ const CreateEmployee = async (req, res) => {
       }
     });
   } else {
-    console.log("Invalid Details");
+    //console.log("Invalid Details");
     const Error = { status: "error", message: "Invalid Details" };
     res.status(400).json(Error);
   }
@@ -165,7 +165,7 @@ const GetEmployees = async (req, res) => {
   // console.log(typeof employeeId); //string
   //
   async function getDataFunc(configID) {
-    console.log("Inside getDataFunc");
+    //console.log("Inside getDataFunc");
     //
     var allData = 0;
     var idData = 0;
@@ -193,14 +193,14 @@ const GetEmployees = async (req, res) => {
     console.log("Back 1");
     //console.log(respView);
     if (respView.status == "success") {
-      console.log("Success employee Data Got");
+      //console.log("Success employee Data Got");
       const Response = {
         message: respView.status,
         responsedata: { employee: respView.data },
       };
       res.status(200).json(Response);
     } else if (respView.status == "error") {
-      console.log("Error");
+      //console.log("Error");
       const err = respView.message;
       const respError = await error_query(err);
       console.log("Back 1-E");
@@ -233,7 +233,7 @@ const UpdateEmployee = async (req, res) => {
     employeeId &&
     employeeId > 0
   ) {
-    console.log("Valid Details");
+    //console.log("Valid Details");
     //
     //STEP_1---------- UpdateEmployee ----------------STARTS
     //------------------------------------------------------
@@ -249,7 +249,7 @@ const UpdateEmployee = async (req, res) => {
       console.log("Back 1");
       //console.log(respEdit);
       if (respEdit.status == "success") {
-        console.log("Success Employee Data Updated");
+        //console.log("Success Employee Data Updated");
         //
         //STEP_2---Get Data for Employee----------------STARTS
         //////////////////////////////////////////////////////
@@ -268,14 +268,14 @@ const UpdateEmployee = async (req, res) => {
           console.log("Back 2");
           //console.log(respView);
           if (respView.status == "success") {
-            console.log("Success employee Data Got");
+            //console.log("Success employee Data Got");
             const Response = {
               message: respView.status,
               responsedata: { employee: respView.data },
             };
             res.status(200).json(Response);
           } else if (respView.status == "error") {
-            console.log("Error");
+            //console.log("Error");
             const err = respView.message;
             const respError = await error_query(err);
             console.log("Back 2-E");
@@ -292,7 +292,7 @@ const UpdateEmployee = async (req, res) => {
         //////////////////////////////////////////////////////
         //
       } else if (respEdit.status == "error") {
-        console.log("Error");
+        //console.log("Error");
         const err = respEdit.message;
         const respError = await error_query(err);
         console.log("Back 1-E");
@@ -312,7 +312,7 @@ const UpdateEmployee = async (req, res) => {
     //////////////////////////////////////////////////////////////////////////////////
     //
   } else {
-    console.log("Invalid Details");
+    //console.log("Invalid Details");
     const Error = { status: "error", message: "Invalid Details" };
     res.status(400).json(Error);
   }
@@ -353,14 +353,14 @@ const DeleteEmployee = async (req, res) => {
     console.log("Back 1");
     //console.log(respDelete);
     if (respDelete.status == "success") {
-      console.log("Success Employee Trash Deleted");
+      //console.log("Success Employee Trash Deleted");
       const Response = {
         status: "success",
         message: "Employee Deleted Successfully",
       };
       res.status(201).json(Response);
     } else if (respDelete.status == "error") {
-      console.log("Error");
+      //console.log("Error");
       const err = respDelete.message;
       const respError = await error_query(err);
       console.log("Back 1-E");
@@ -764,7 +764,7 @@ const PasswordUpdate = async (req, res) => {
 module.exports = {
   CreateEmployee, //done
   GetEmployees, //done
-  UpdateEmployee,
+  UpdateEmployee, //done
   DeleteEmployee, //done
   //
   ForgotPassword,

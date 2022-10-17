@@ -36,11 +36,13 @@ app.get("/", (req, res) => {
   res.send("Hello You are Welcome to Screen Monitoring App");
 });
 
+//PENDING-------------------------------------------------------------STARTS
 const accesstokenRouter = require("./routes/AccessToken");
 app.use("/accesstoken", GenuineToken, accesstokenRouter);
 
 const loginRouter = require("./routes/Login");
 app.use("/login", GenuineToken, loginRouter);
+//PENDING-------------------------------------------------------------ENDS
 
 const userRouter = require("./routes/Employee");
 app.use("/employee", GenuineToken, userRouter);
@@ -51,7 +53,7 @@ app.use("/client", GenuineToken, clientRouter);
 const projectRouter = require("./routes/Project");
 app.use("/project", GenuineToken, projectRouter);
 
-// const logsRouter = require("./routes/Logs");
-// app.use("/logs", logsRouter);
+const logsRouter = require("./routes/Logs");
+app.use("/logs", logsRouter);
 
 app.listen(port, () => console.log(`Listen on port ${port}`));

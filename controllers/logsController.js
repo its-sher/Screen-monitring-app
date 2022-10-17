@@ -1,3 +1,4 @@
+var moment = require("moment");
 const con = require("../models/db");
 const {
   add_query,
@@ -8,39 +9,37 @@ const {
   trash_query,
 } = require("../helpers/instructions");
 //
-console.log("Inside Client Controller");
-const table_name = "client";
+console.log("Inside Log Controller");
+const table_name = "logs";
 //
 //-------------------------------------------------------------------------------------------------------------
 //
-// CreateClient ----------------------------------------------------------------
-const CreateClient = async (req, res) => {
-  console.log("inside CreateClient");
-  const dataClientTable = req.body;
-  //console.log(dataClientTable);
+// CreateLog ----------------------------------------------------------------
+const CreateLog = async (req, res) => {
+  console.log("inside CreateLog");
+  const dataLogTable = req.body;
+  //console.log(dataLogTable);
   //
   if (
-    dataClientTable.first_Name &&
-    dataClientTable.first_Name.length > 0 &&
-    dataClientTable.last_Name &&
-    dataClientTable.last_Name.length > 0 &&
-    // dataClientTable.phone &&
-    // dataClientTable.phone > 0 &&
-    dataClientTable.email &&
-    dataClientTable.email.length > 0
+    dataLogTable.employee_id &&
+    dataLogTable.employee_id > 0 &&
+    dataLogTable.attachment_name &&
+    dataLogTable.attachment_name.length > 0 &&
+    dataLogTable.data_time &&
+    dataLogTable.activity_grade
   ) {
-    //console.log(dataClientTable);
+    //console.log(dataLogTable);
     let filteredData = Object.fromEntries(
-      Object.entries(dataClientTable).filter(
+      Object.entries(dataLogTable).filter(
         ([_, v]) => v != "null" && v != "" && v != null
       )
     );
     // console.log(filteredData);
     //
-    //STEP_1---createClient and get data----------------STARTS
+    //STEP_1---createLog and get data----------------STARTS
     //------------------------------------------------------
-    async function createClient(saveData) {
-      console.log("Inside createClient");
+    async function createLog(saveData) {
+      console.log("Inside createLog");
       //   console.log(saveData);
       //
       let add_payload = {
@@ -52,14 +51,14 @@ const CreateClient = async (req, res) => {
       console.log("Back 1");
       //console.log(respAdd);
       if (respAdd.status == "success") {
-        //console.log("Success Client Created");
+        //console.log("Success Log Created");
         const id = respAdd.id;
         //
-        //Get data for created Client-------------STARTS++++++++++++++++++++++
+        //Get data for created Log-------------STARTS++++++++++++++++++++++
         let view_payload = {
           table_name: table_name,
           dataToGet:
-            "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, source, active, description",
+            "id, employee_id, attachment_name, data_time, activity_grade",
           query_field: "id",
           query_value: id,
         };
@@ -67,10 +66,10 @@ const CreateClient = async (req, res) => {
         console.log("Back 2");
         //console.log(respView);
         if (respView.status == "success") {
-          //console.log("Success Client Data Got");
+          //console.log("Success Log Data Got");
           const Response = {
             message: respView.status,
-            responsedata: { client: respView.data },
+            responsedata: { log: respView.data },
           };
           res.status(201).json(Response);
         } else if (respView.status == "error") {
@@ -85,14 +84,14 @@ const CreateClient = async (req, res) => {
           };
           res.status(respError.statusCode).json(Error);
         }
-        //Get data for created Client-------------ENDS++++++++++++++++++++++
+        //Get data for created Log-------------ENDS++++++++++++++++++++++
         //
       } else if (respAdd.status == "error") {
         //console.log("Error");
         const err = respAdd.message;
         const respError = await error_query(err);
         console.log("Back 1-E");
-        //  console.log(respError);
+        //console.log(respError);
         const Error = {
           status: "error",
           message: respError.message,
@@ -100,8 +99,8 @@ const CreateClient = async (req, res) => {
         res.status(respError.statusCode).json(Error);
       }
     }
-    await createClient(filteredData);
-    //STEP_1---createClient and get data----------------ENDS
+    await createLog(filteredData);
+    //STEP_1---createLog and get data----------------ENDS
     //------------------------------------------------------
     //
   } else {
@@ -112,12 +111,12 @@ const CreateClient = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-//GetClient ---------------------------------------------------------------------------------
-const GetClient = async (req, res) => {
-  console.log("inside GetClient");
+//GetLog ---------------------------------------------------------------------------------
+const GetLog = async (req, res) => {
+  console.log("inside GetLog");
   //
-  const clientId = req.params.id;
-  // console.log(clientId);
+  const logId = req.params.id;
+  // console.log(logId);
   //
   async function getDataFunc(configID) {
     //console.log("Inside getDataFunc");
@@ -131,13 +130,13 @@ const GetClient = async (req, res) => {
       view_payload = {
         table_name: table_name,
         dataToGet:
-          "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, source, active, description",
+          "id, employee_id, attachment_name, data_time, activity_grade",
       };
     } else if (idData == 1) {
       view_payload = {
         table_name: table_name,
         dataToGet:
-          "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, source, active, description",
+          "id, employee_id, attachment_name, data_time, activity_grade",
         query_field: "id",
         query_value: configID,
       };
@@ -148,10 +147,10 @@ const GetClient = async (req, res) => {
     console.log("Back 1");
     //console.log(respView);
     if (respView.status == "success") {
-      //console.log("Success Client Data Got");
+      //console.log("Success Log Data Got");
       const Response = {
         message: respView.status,
-        responsedata: { client: respView.data },
+        responsedata: { log: respView.data },
       };
       res.status(200).json(Response);
     } else if (respView.status == "error") {
@@ -167,36 +166,36 @@ const GetClient = async (req, res) => {
       res.status(respError.statusCode).json(Error);
     }
   }
-  await getDataFunc(clientId);
+  await getDataFunc(logId);
   //
 };
 //-----------------------------------------------------------------------------------------------------------
 //
-// UpdateClient -----------------------------------------------------------------
-const UpdateClient = async (req, res) => {
-  console.log("Inside UpdateClient");
+// UpdateLog -----------------------------------------------------------------
+const UpdateLog = async (req, res) => {
+  console.log("Inside UpdateLog");
   const data = req.body;
   // console.log(data);
   //
-  const clientId = req.params.id;
-  //console.log(clientId);
+  const logId = req.params.id;
+  //console.log(logId);
   //
   if (
     data &&
     data !== undefined &&
     Object.keys(data).length != 0 &&
-    clientId &&
-    clientId > 0
+    logId &&
+    logId > 0
   ) {
     //console.log("Valid Details");
     //
-    //STEP_1---------- UpdateClient ----------------STARTS
+    //STEP_1---------- UpdateLog ----------------STARTS
     //------------------------------------------------------
     async function updateDataFunc() {
       let update_payload = {
         table_name: table_name,
         query_field: "id",
-        query_value: clientId,
+        query_value: logId,
         dataToSave: data,
       };
       //console.log(update_payload);
@@ -204,9 +203,9 @@ const UpdateClient = async (req, res) => {
       console.log("Back 1");
       //console.log(respEdit);
       if (respEdit.status == "success") {
-        //console.log("Success Client Data Updated");
+        //console.log("Success Log Data Updated");
         //
-        //STEP_2---Get Data for Client----------------STARTS
+        //STEP_2---Get Data for Log----------------STARTS
         //////////////////////////////////////////////////////
         async function getDataFunc() {
           console.log("Inside getDataFunc");
@@ -214,19 +213,19 @@ const UpdateClient = async (req, res) => {
           const view_payload = {
             table_name: table_name,
             dataToGet:
-              "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, source, active, description",
+              "id, employee_id, attachment_name, data_time, activity_grade",
             query_field: "id",
-            query_value: clientId,
+            query_value: logId,
           };
           // console.log(view_payload);
           const respView = await view_query(view_payload);
           console.log("Back 2");
           //console.log(respView);
           if (respView.status == "success") {
-            //console.log("Success Client Data Got");
+            //console.log("Success Log Data Got");
             const Response = {
               message: respView.status,
-              responsedata: { client: respView.data },
+              responsedata: { log: respView.data },
             };
             res.status(200).json(Response);
           } else if (respView.status == "error") {
@@ -243,7 +242,7 @@ const UpdateClient = async (req, res) => {
           }
         }
         await getDataFunc();
-        //STEP_2---Get Data for Client----------------ENDS
+        //STEP_2---Get Data for Log----------------ENDS
         //////////////////////////////////////////////////////
         //
       } else if (respEdit.status == "error") {
@@ -259,7 +258,7 @@ const UpdateClient = async (req, res) => {
         res.status(respError.statusCode).json(Error);
       }
       //
-      //STEP_1---------- UpdateClient ----------------ENDS
+      //STEP_1---------- UpdateLog ----------------ENDS
       //------------------------------------------------------
       //
     }
@@ -274,14 +273,14 @@ const UpdateClient = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-// DeleteClient (Trash)--------------------------------------------------
-const DeleteClient = async (req, res) => {
-  console.log("Inside DeleteClient");
-  const clientId = req.params.id;
-  // console.log(clientId);
+// DeleteLog (Trash)--------------------------------------------------
+const DeleteLog = async (req, res) => {
+  console.log("Inside DeleteLog");
+  const logId = req.params.id;
+  // console.log(logId);
   //
   async function deleteConfigFunc(deleteID) {
-    console.log("Inside DeleteClient");
+    console.log("Inside DeleteLog");
     //   console.log(deleteID);
     //----------------------1----------------------------------------------
     // let update_payload = {
@@ -299,7 +298,7 @@ const DeleteClient = async (req, res) => {
       query_field: "id",
       query_value: deleteID,
       dataToSave: {
-        active: 0,
+        //active: 0,
         trash: 1,
       },
     };
@@ -308,10 +307,10 @@ const DeleteClient = async (req, res) => {
     console.log("Back 1");
     //console.log(respDelete);
     if (respDelete.status == "success") {
-      //console.log("Success Client Trash Deleted");
+      //console.log("Success Log Trash Deleted");
       const Response = {
         status: "success",
-        message: "Client Deleted Successfully",
+        message: "Log Deleted Successfully",
       };
       res.status(201).json(Response);
     } else if (respDelete.status == "error") {
@@ -328,14 +327,14 @@ const DeleteClient = async (req, res) => {
     }
     //-------------------2--------------------------------------------------
   }
-  await deleteConfigFunc(clientId);
+  await deleteConfigFunc(logId);
   //
 };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
 module.exports = {
-  CreateClient, //done
-  GetClient, //done
-  UpdateClient, //done
-  DeleteClient, //done
+  CreateLog, //done
+  GetLog, //done
+  UpdateLog, //done
+  DeleteLog, //done
 };

@@ -1,4 +1,3 @@
-var moment = require("moment");
 const con = require("../models/db");
 const {
   add_query,
@@ -88,7 +87,7 @@ const CreateProject = async (req, res) => {
         const err = respAdd.message;
         const respError = await error_query(err);
         console.log("Back 1-E");
-        console.log(respError);
+        //console.log(respError);
         const Error = {
           status: "error",
           message: respError.message,
