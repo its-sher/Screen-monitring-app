@@ -199,45 +199,45 @@ const view_query = (view_payload) => {
     }
 
     const sql = con.query(sqlquery, params, (error, result) => {
-      if (!error) {
-        //console.log(result);
-        if (result && result.length > 0) {
-          console.log("Query Success - view_query HELPER");
-          //array is defined and is not empty
-          //
-          //removing row data packet-------------STARTS
-          var resultArray = Object.values(JSON.parse(JSON.stringify(result)));
-          //  console.log(resultArray);
-          //removing row data packet-------------ENDS
-          //
-          const Response = {
-            status: "success",
-            data: resultArray,
-          };
-          resolve(Response);
-        } else {
-          console.log("No Data - view_query HELPER ");
-          const Error = {
-            code: "NO_DATA",
-            sqlMessage: "No Data",
-          };
-          reject(Error);
-        }
-      } else {
-        console.log("Query Error - view_query HELPER");
+      if (error) {
+        //console.log("Query Error - view_query HELPER");
         reject(error);
       }
+      //  console.log(result);
+
+      if (result && result.length > 0) {
+        //console.log("Query Success - view_query HELPER");
+        //array is defined and is not empty
+        //
+        //removing row data packet-------------STARTS
+        var resultArray = Object.values(JSON.parse(JSON.stringify(result)));
+        //  console.log(resultArray);
+        //removing row data packet-------------ENDS
+        //
+        const Response = {
+          status: "success",
+          data: resultArray,
+        };
+        resolve(Response);
+      } else {
+        //console.log("No Data - view_query HELPER ");
+        const Error = {
+          code: "NO_DATA",
+          sqlMessage: "No Data",
+        };
+        reject(Error);
+      }
     });
-    console.log(sql.sql);
+    //console.log(sql.sql);
   });
-  const dd = promise1
+  const response_promise = promise1
     .then((value) => {
-      console.log("promise done - view_query HELPER");
+      //console.log("promise done - view_query HELPER");
       //console.log(value);
       return value;
     })
     .catch((error) => {
-      console.log("Catch Error - view_query HELPER");
+      //console.log("Catch Error - view_query HELPER");
       // console.log(error);
       const Error = {
         status: "error",
@@ -245,7 +245,7 @@ const view_query = (view_payload) => {
       };
       return Error;
     });
-  return dd;
+  return response_promise;
 };
 //-----------------------------------------------------------------
 //
@@ -450,7 +450,7 @@ const delete_query = (delete_payload) => {
           }
           //console.log(result);
           if (typeof result === "undefined") {
-            console.log("Not Permitted to Delete");
+            //console.log("Not Permitted to Delete");
             const Error = {
               code: "NOT_PERMITTED_TO_DELETE",
               sqlMessage: "Not Permitted to Delete",

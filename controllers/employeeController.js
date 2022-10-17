@@ -172,14 +172,6 @@ const GetEmployees = async (req, res) => {
     var view_payload;
     configID == "all" ? (allData = 1) : (idData = 1);
     //
-    // password
-    // verification_code
-    // access_token
-    // refresh_token
-    // api_key
-    // trash
-    // created_at
-    // updated_at
     if (allData == 1) {
       view_payload = {
         table_name: table_name,
@@ -242,9 +234,9 @@ const UpdateEmployee = async (req, res) => {
     employeeId > 0
   ) {
     console.log("Valid Details");
-    var varUpdateDone = 0;
     //
-    //////////////////////////////////////////////////////////////////////////////////
+    //STEP_1---------- UpdateEmployee ----------------STARTS
+    //------------------------------------------------------
     async function updateDataFunc() {
       let update_payload = {
         table_name: table_name,
@@ -252,14 +244,52 @@ const UpdateEmployee = async (req, res) => {
         query_value: employeeId,
         dataToSave: data,
       };
-
       //console.log(update_payload);
       const respEdit = await edit_query(update_payload);
       console.log("Back 1");
       //console.log(respEdit);
       if (respEdit.status == "success") {
         console.log("Success Employee Data Updated");
-        varUpdateDone = 1;
+        //
+        //STEP_2---Get Data for Employee----------------STARTS
+        //////////////////////////////////////////////////////
+        async function getDataFunc() {
+          console.log("Inside getDataFunc");
+          //
+          const view_payload = {
+            table_name: table_name,
+            dataToGet:
+              "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, employee_id, active, description",
+            query_field: "id",
+            query_value: employeeId,
+          };
+          // console.log(view_payload);
+          const respView = await view_query(view_payload);
+          console.log("Back 2");
+          //console.log(respView);
+          if (respView.status == "success") {
+            console.log("Success employee Data Got");
+            const Response = {
+              message: respView.status,
+              responsedata: { employee: respView.data },
+            };
+            res.status(200).json(Response);
+          } else if (respView.status == "error") {
+            console.log("Error");
+            const err = respView.message;
+            const respError = await error_query(err);
+            console.log("Back 2-E");
+            console.log(respError);
+            const Error = {
+              status: "error",
+              message: respError.message,
+            };
+            res.status(respError.statusCode).json(Error);
+          }
+        }
+        await getDataFunc();
+        //STEP_2---Get Data for Employee----------------ENDS
+        //////////////////////////////////////////////////////
         //
       } else if (respEdit.status == "error") {
         console.log("Error");
@@ -273,50 +303,13 @@ const UpdateEmployee = async (req, res) => {
         };
         res.status(respError.statusCode).json(Error);
       }
-      //STEP-1 Insert Ends===================================================
+      //
+      //STEP_1---------- UpdateEmployee ----------------ENDS
+      //------------------------------------------------------
+      //
     }
     await updateDataFunc();
     //////////////////////////////////////////////////////////////////////////////////
-    //
-    if (varUpdateDone == 1) {
-      //////////////////////////////////////////////////////////////////////////////////
-      async function getDataFunc() {
-        console.log("Inside getDataFunc");
-        //
-        const view_payload = {
-          table_name: table_name,
-          dataToGet:
-            "id, first_Name, last_Name, nick_name, phone, email, address_line1, address_line2, city, state, country, postal_code, image, gender, date_of_birth, employee_id, active, description",
-          query_field: "id",
-          query_value: employeeId,
-        };
-        // console.log(view_payload);
-        const respView = await view_query(view_payload);
-        console.log("Back 2");
-        //console.log(respView);
-        if (respView.status == "success") {
-          console.log("Success employee Data Got");
-          const Response = {
-            message: respView.status,
-            responsedata: { employee: respView.data },
-          };
-          res.status(200).json(Response);
-        } else if (respView.status == "error") {
-          console.log("Error");
-          const err = respView.message;
-          const respError = await error_query(err);
-          console.log("Back 2-E");
-          console.log(respError);
-          const Error = {
-            status: "error",
-            message: respError.message,
-          };
-          res.status(respError.statusCode).json(Error);
-        }
-      }
-      await getDataFunc();
-      //////////////////////////////////////////////////////////////////////////////////
-    }
     //
   } else {
     console.log("Invalid Details");
