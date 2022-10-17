@@ -49,7 +49,7 @@ const CreateAccessRefreshToken = async (req, res) => {
       table_name: table_name,
       query_field: "email",
       query_value: email,
-      dataToGet: "id, first_Name, last_Name, phone, email, image, password",
+      dataToGet: "id, password",
     };
     const respView = await view_query(view_payload);
     console.log("Back 1");
@@ -77,28 +77,12 @@ const CreateAccessRefreshToken = async (req, res) => {
             const userId = userDataDb[0].id;
             //const encodedid = encrypttheid(userId);
             //
-            //removing row data packet-------------STARTS
-            var resultUserDataArray = Object.values(
-              JSON.parse(JSON.stringify(userDataDb))
-            );
-            //   console.log(resultUserDataArray);
-            //removing row data packet-------------ENDS
-            //
             //creating access token and refresh token ------------STARTS
-            //
-            const accesstoken = accesstokencreation(resultUserDataArray);
+            const accesstoken = accesstokencreation(userId);
             //console.log(accesstoken);
-            const refreshtoken = refreshtokencreation(resultUserDataArray);
+            const refreshtoken = refreshtokencreation(userId);
             // console.log(refreshtoken);
-            //
-            //creating access token and refresh token ------------STARTS
-            //
-            //collect data req from user---starts
-            var payload = resultUserDataArray[0];
-            delete payload.password;
-            payload["access_token"] = accesstoken;
-            payload["refresh_token"] = refreshtoken;
-            //collect data req from user---ends
+            //creating access token and refresh token ------------ENDS
             //
             let update_payload = {
               table_name: table_name,
@@ -121,11 +105,13 @@ const CreateAccessRefreshToken = async (req, res) => {
               if (respEdit.status == "success") {
                 console.log("Success User Updated");
                 //
+                const output = {
+                  access_token: accesstoken,
+                  refresh_token: refreshtoken,
+                };
                 const Response = {
                   message: "success",
-                  // accesstoken: accesstoken,
-                  // refreshtoken: refreshtoken,
-                  responsedata: payload,
+                  responsedata: output,
                 };
                 res.status(200).json(Response);
                 //

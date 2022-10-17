@@ -6,8 +6,8 @@ const { v4: uuidv4 } = require("uuid");
 const accesstokencreation = (req, res) => {
   // console.log(req[0].id);
   const result = req[0];
-  // console.log(result.id);
-  const userid = result.id; //194
+  // console.log(result);
+  const userid = result; //194
   const multiply = userid * 38727; //----------------------------------later
   const date = Date.now();
   //console.log(date);
@@ -31,8 +31,8 @@ const accesstokencreation = (req, res) => {
 const refreshtokencreation = (req, res) => {
   // console.log(req[0].id);
   const result = req[0];
-  // console.log(result.id);
-  const userid = result.id; //194
+  // console.log(result);
+  const userid = result; //194
   const multiply = userid * 723593727; //----------------------------------later
   const date = Date.now();
   //console.log(date);

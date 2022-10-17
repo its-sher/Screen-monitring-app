@@ -1,203 +1,160 @@
 const con = require("../models/db");
 const bcrypt = require("bcrypt");
-const { usertokencreation } = require("../helpers/user-token-creation");
-const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
+const {
+  accesstokencreation,
+  refreshtokencreation,
+} = require("../helpers/user-token-creation");
+const {
+  view_query,
+  edit_query,
+  error_query,
+} = require("../helpers/instructions");
 console.log("Inside Login controller");
 const table_name = "employees";
 //
 const Login = async (req, res) => {
-  console.log("Login User");
-  //console.log(req.session);
-  //console.log("Node-inside login ");
-  //console.log(req);
-  const phoneoremailvalue = req.body.phoneoremail; //9999988888
+  console.log("Inside Login");
+  const email = req.body.email;
+  //console.log(email);
   const password = req.body.password; //password is password (hashed)
-
-  //validating email address or mobile number
-  var checkemailorphone = isValidEmail(phoneoremailvalue); // true
-  function isValidEmail(phoneoremailvalue) {
-    //console.log(!isNaN(phoneoremailvalue));
-    var emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (
-      phoneoremailvalue.match(emailRegex) &&
-      typeof phoneoremailvalue === "string"
-    ) {
-      return "email";
-    } else if (!isNaN(phoneoremailvalue)) {
-      return "phone";
-    }
-  }
-
-  if (
-    (checkemailorphone == "email" || checkemailorphone == "phone") &&
-    checkemailorphone.length > 0
-  ) {
-    // console.log(phoneoremailvalue);
+  //console.log(password);
+  //
+  if (email && email.length > 0) {
     //check for user
-    // const sql = con.query(
-    con.query(
-      "SELECT id, first_Name, last_Name, phone, email, image, active, password FROM " +
-        [table_name] +
-        " WHERE " +
-        checkemailorphone +
-        " = ?",
-      [phoneoremailvalue],
-      async (err, result) => {
-        if (!err) {
-          //console.log(result);
-          if (result && result.length > 0) {
-            console.log("user exists");
-            //console.log(result);
-            //console.log(result);
-            bcrypt.compare(
-              password,
-              result[0].password,
-              async (error, response) => {
-                if (!error) {
-                  // console.log("password check");
-                  // console.log(response); //true or false
-                  // console.log("password check");
-                  if (response == true) {
-                    //console.log(req.body);
-                    //
-                    const userId = result[0].id;
-                    const encodedid = encrypttheid(userId);
-                    //
-                    //removing row data packet-------------STARTS
-                    var resultUserDataArray = Object.values(
-                      JSON.parse(JSON.stringify(result))
-                    );
-                    //   console.log(resultUserDataArray);
-                    //removing row data packet-------------ENDS
-                    //
-                    //HANDLING SESSION-------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++STARTS
-                    //create user token start--save that encrypted access token in db n cookie
-                    const token = usertokencreation(result);
-                    // //
-                    // var ip =
-                    //   req.header("x-forwarded-for") ||
-                    //   req.connection.remoteAddress;
-                    // //console.log("IP ADDRESS-->" + ip);
-                    // //SESSION has cookie------------------------------------------------------------1
-                    // //ADDING DATA TO SESSION (NOT TABLE)---------------STARTS
-                    // req.session.users_id = encodedid; //session gets users_id------------------------2
-                    // req.session.accesstoken = token; //session gets accesstoken-----------------------3
-                    // //
-                    // //  console.log("Session id");
-                    // const sessionID = req.sessionID; //session id used to save data in row
-                    // //  console.log(sessionID);
-                    // req.session.sess_id = sessionID; //session gets session id-----------------------------4
-                    // //
-                    // req.session.ipaddress = ip; //session gets ipaddress-----------------------------5
-                    // // req.session.isAuth = true;
-                    // req.session.login = true; //session gets login------------------------------------6
-                    // //
-                    // //
-                    // //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxx
-                    // //active status for user
-                    // req.session.active = result[0].active; //session gets active value-----------------------------------6-B
-                    // //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxx
-                    // //
-                    // //ADDING DATA TO SESSION (NOT TABLE)----------------ENDS
-                    // // console.log("Final Session");
-                    // //  console.log(req.session);
-                    // //Colect Data to update in session table, then update it **********************************STARTS
-                    // //
-                    // const UseridTokenData = {
-                    //   //users_id: userId,//ezmoov-->this was used
-                    //   users_id: encodedid, //teamlogger-->this is used
-                    //   access_token: token,
-                    //   ipaddress: ip,
-                    //   entity: "Employee",
-                    // };
-                    // //console.log(UseridTokenData);
-                    // //start-11111^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    // setTimeout(function () {
-                    //   const sql = con.query(
-                    //     // con.query(
-                    //     "UPDATE sessions SET ? WHERE session_id=?",
-                    //     [UseridTokenData, sessionID],
-                    //     (err, result) => {
-                    //       if (!err) {
-                    //         //console.log(result);
-                    //         if (result.changedRows > 0) {
-                    //           console.log(
-                    //             "Record Updated wd token n dash-user id"
-                    //           );
-                    //         } else {
-                    //           console.log("Update Error --  NOTHING UPDATED");
-                    //           const Error = {
-                    //             status: "error",
-                    //             message: "Server Error",
-                    //           };
-                    //           res.status(400).json(Error);
-                    //         }
-                    //       } else {
-                    //         console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                    //         console.log(err);
-                    //         const Error = {
-                    //           status: "error",
-                    //           message: "Server Error",
-                    //         };
-                    //         res.status(400).json(Error);
-                    //       }
-                    //     }
-                    //   );
-                    //   console.log(sql.sql);
-                    // }, 1000);
-                    // //ends--11111^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                    // //Colect Data to update in session table, then update it **********************************ENDS
-                    // //HANDLING SESSION-------------------------------------------++++++++++++++++++++++++++++++++++++++++++++++++++++ENDS
-                    // //
-                    // const sessdata = req.session;
-                    const Response = {
-                      login: true,
-                      sessdata,
-                      message: "login success",
-                    };
-                    //console.log("loginsuccess");
-                    res.status(200).json(Response);
-                    //
-                  } else {
-                    console.log("Wrong username/password combination!");
-                    const Response = {
-                      message: "Wrong username/password combination!",
-                    };
-                    res.status(203).json(Response);
-                  }
+    var userDataDb;
+    //Get data for employee-------------STARTS
+    //////////////////////////////////////////////////////////////////////////////////
+    async function getDataFunc() {
+      console.log("Inside getDataFunc");
+      let view_payload = {
+        table_name: table_name,
+        query_field: "email",
+        query_value: email,
+        dataToGet:
+          "id, first_Name, last_Name, phone, email, image, active, password",
+      };
+      const respView = await view_query(view_payload);
+      console.log("Back 1");
+      //console.log(respView);
+      if (respView.status == "success") {
+        console.log("Success Employee Data Got");
+        userDataDb = respView.data;
+
+        //Compare password ------------------------------------------------starts
+        bcrypt.compare(
+          password,
+          userDataDb[0].password,
+          async (error, response) => {
+            if (error) {
+              console.log("Bcrypt Error");
+              //console.log(error);
+              const Error = { status: "error", message: "Server Error" };
+              res.status(400).json(Error);
+            }
+            // console.log("password check");
+            // console.log(response); //true or false
+            // console.log("password check");
+            if (response == true) {
+              console.log("loginsuccess");
+              const userId = userDataDb[0].id;
+              //const encodedid = encrypttheid(userId);
+              //
+              //removing row data packet-------------STARTS
+              var resultUserDataArray = Object.values(
+                JSON.parse(JSON.stringify(userDataDb))
+              );
+              //   console.log(resultUserDataArray);
+              //removing row data packet-------------ENDS
+              //
+              //creating access token and refresh token ------------STARTS
+              const accesstoken = accesstokencreation(userId);
+              //console.log(accesstoken);
+              const refreshtoken = refreshtokencreation(userId);
+              // console.log(refreshtoken);
+              //creating access token and refresh token ------------ENDS
+              //
+              let update_payload = {
+                table_name: table_name,
+                query_field: "id",
+                query_value: userId,
+                dataToSave: {
+                  access_token: accesstoken,
+                  refresh_token: refreshtoken,
+                },
+              };
+              //
+              //STEP_2---updateUser----------------STARTS
+              //------------------------------------------------------
+              async function updateUser(saveData) {
+                //  console.log("Inside updateUser");
+                //   console.log(saveData);
+                const respEdit = await edit_query(saveData);
+                console.log("Back 2");
+                //console.log(respEdit);
+                if (respEdit.status == "success") {
+                  console.log("Success User Updated");
                   //
-                } else {
-                  console.log("Bcrypt Error");
-                  console.log(error);
-                  const Error = { status: "error", message: "Server Error" };
-                  res.status(400).json(Error);
+                  //collect data req from user---starts
+                  var output = resultUserDataArray[0];
+                  delete output.password;
+                  output["access_token"] = accesstoken;
+                  output["refresh_token"] = refreshtoken;
+                  //collect data req from user---ends
+                  //
+                  const Response = {
+                    message: "success",
+                    responsedata: output,
+                  };
+                  res.status(200).json(Response);
+                  //
+                } else if (respEdit.status == "error") {
+                  // console.log("Error");
+                  const err = respEdit.message;
+                  const respError = await error_query(err);
+                  console.log("Back 2-E");
+                  //  console.log(respError);
+                  const Error = {
+                    status: "error",
+                    message: respError.message,
+                  };
+                  res.status(respError.statusCode).json(Error);
                 }
-                //
               }
-            );
-          } else {
-            console.log("no user");
-            const Response = {
-              message: "User doesn't exist",
-            };
-            res.status(204).json(Response);
+              await updateUser(update_payload);
+              //STEP_2---updateUser----------------ENDS
+              //------------------------------------------------------
+            } else {
+              //console.log("Wrong username/password combination!");
+              const Response = {
+                message: "Wrong username/password combination!",
+              };
+              res.status(203).json(Response);
+            }
           }
-          //
-        } else {
-          console.log(err);
-          const Error = { status: "error", message: "Server Error" };
-          res.status(400).json(Error);
-        }
-        //
+        );
+        //Compare password ------------------------------------------------ends
+      } else if (respView.status == "error") {
+        //console.log("Error");
+        const err = respAdd.message;
+        const respError = await error_query(err);
+        console.log("Back 1-E");
+        //console.log(respError);
+        const Error = {
+          status: "error",
+          message: respError.message,
+        };
+        res.status(respError.statusCode).json(Error);
       }
-    );
-    //console.log(sql.sql);
+    }
+    await getDataFunc();
+    //////////////////////////////////////////////////////////////////////////////////
+    //Get data for employee-------------ENDS
   } else {
-    console.log("Neither email nor Phone");
+    //console.log("Invalid Details");
     const Response = {
-      message: "Neither email nor Phone",
+      message: "Invalid Details",
     };
-    res.status(204).json(Response);
+    res.status(400).json(Response);
   }
   //
 };
