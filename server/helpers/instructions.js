@@ -21,15 +21,18 @@ const sql_query = (sql_query_payload) => {
       var sqlquery;
       var params;
 
-      sqlquery = add_payload.sql_script;
-      params = [add_payload.sql_values];
+      sqlquery = sql_query_payload.sql_script;
+      //console.log(sqlquery);
+      params = sql_query_payload.sql_values;
+      // console.log(params);
+
       const sql = con.query(sqlquery, params, (error, result) => {
         if (error) {
           // console.log("Query Error - sql_query HELPER");
           reject(error);
         }
-        //  console.log(result);
-        if (result && result.affectedRows > 0) {
+        //console.log(result);
+        if (result && result.length > 0) {
           //console.log("Query Success - sql_query HELPER");
           const Response = {
             status: "success",
@@ -41,7 +44,7 @@ const sql_query = (sql_query_payload) => {
           reject();
         }
       });
-      // console.log(sql.sql);
+      console.log(sql.sql);
     });
     const response_promise = promise1
       .then((value) => {
