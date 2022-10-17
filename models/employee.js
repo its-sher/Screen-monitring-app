@@ -2,27 +2,7 @@ const con = require("./db");
 const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
 ///////////////////////////////////MIDDLEWARES//////////////////////////////////////////////////////
 //
-//CHECK DB EMPTY------------------------------------------------------------------------------------
-const dbempty = (req, res, next) => {
-  console.log("---check dbempty Middleware---");
-  con.query("SELECT id from employees", (err, response) => {
-    if (!err) {
-      if (response && response.length) {
-        console.log("Middleware Passed");
-        next();
-      } else {
-        console.log("Middleware Failure");
-        const Error = {
-          status: "error",
-          message: "No record in TABLE",
-        };
-        res.status(204).json(Error);
-      }
-    }
-  });
-};
 //--------------------------------------------------------------------------------------------------
-//
 //CHECK IF USERID EXISTS OR NOT - --
 const checkemployee = (req, res, next) => {
   console.log("---checkemployee Middleware---");
@@ -301,7 +281,6 @@ const checkemployeealready = (req, res, next) => {
 
 //--------------------------------------------------------------------------------------------
 module.exports = {
-  dbempty,
   checkemployee,
   checkemployeealready,
   //

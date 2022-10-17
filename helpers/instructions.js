@@ -553,7 +553,12 @@ const error_query = async (error) => {
       messageERR = "Keys entered is already taken";
       code = 400;
     } else {
-      messageERR = "Sql Error";
+      //console.log(error.code);
+      if (error.sqlMessage) {
+        messageERR = error.sqlMessage;
+      } else {
+        messageERR = "Sql Error";
+      }
       code = 400;
     }
     f = { message: messageERR, statusCode: code };

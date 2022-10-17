@@ -33,8 +33,11 @@ app.use(
 console.log("Inside index.js");
 //
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Hello You are Welcome to Screen Monitoring App");
 });
+
+const accesstokenRouter = require("./routes/AccessToken");
+app.use("/accesstoken", GenuineToken, accesstokenRouter);
 
 const loginRouter = require("./routes/Login");
 app.use("/login", GenuineToken, loginRouter);
@@ -42,14 +45,11 @@ app.use("/login", GenuineToken, loginRouter);
 const userRouter = require("./routes/Employee");
 app.use("/employee", GenuineToken, userRouter);
 
-const accesstokenRouter = require("./routes/AccessToken");
-app.use("/accesstoken", GenuineToken, accesstokenRouter);
+const clientRouter = require("./routes/Client");
+app.use("/client", GenuineToken, clientRouter);
 
-// const clientRouter = require("./routes/Client");
-// app.use("/client", GenuineToken, clientRouter);
-
-// const projectRouter = require("./routes/Project");
-// app.use("/project", GenuineToken, projectRouter);
+const projectRouter = require("./routes/Project");
+app.use("/project", GenuineToken, projectRouter);
 
 // const logsRouter = require("./routes/Logs");
 // app.use("/logs", logsRouter);
