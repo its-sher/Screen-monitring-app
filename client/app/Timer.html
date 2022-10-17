@@ -31,8 +31,8 @@
 <div class="section4_">
     Connect to the Internet and stop the timer to switch back to Online Mode.
 </div>
-<button id="start-btn"style="display:none">Start</button>
-<button id="stop-btn">Stop</button>
+<button id="start-btn"onclick="start()">Start</button>
+<button id="stop-btn"onclick="stop()">Stop</button>
 <div class="section5_">
     <p>View Task Notes</p>
 </div>
@@ -71,7 +71,6 @@ intervalId = setInterval(startTimer, 1000);
       clearInterval(intervalId);
   });
 };
-
 </script>
 
 </html>
