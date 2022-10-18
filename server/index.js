@@ -56,4 +56,7 @@ app.use("/project", GenuineToken, projectRouter);
 const logsRouter = require("./routes/Logs");
 app.use("/logs", logsRouter);
 
+const attachmentsRouter = require("./routes/Attachments");
+app.use("/attachments", attachmentsRouter);
+
 app.listen(port, () => console.log(`Listen on port ${port}`));
