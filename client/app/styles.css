@@ -64,6 +64,7 @@ i.fa.fa-plus-circle::before {
     font-size: 16px;
     color: #0079da;
     padding-left: 10px;
+    cursor: pointer;
 }
 span.add_task {
     padding: 0 0 0 10px;
@@ -71,6 +72,7 @@ span.add_task {
     font-family: sans-serif;
     font-weight: 600;
     color: #0079da;
+    cursor: pointer;
 }
 #input{
 	width: 40%;
@@ -487,4 +489,33 @@ div#first-timer {
 }
 div#second-timer {
     padding: 0 15px 0 0px;
+}
+.AddTaskInput input {
+    width: 40%;
+    padding: 6px 10px;
+    font-size: 17px;
+}
+span.plus_icon {
+    cursor: pointer;
+}
+.InnerAddTaskInput {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+a.AddTaskSave {
+    color: blue;
+    font-weight: bold;
+    margin: 0 10px 0 10px;
+    font-family: sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+}
+a.AddTaskCancel {
+    color: red;
+    font-weight: bold;
+    margin: 0 10px 0 10px;
+    font-family: sans-serif;
+    font-size: 15px;
+    cursor: pointer;
 }
