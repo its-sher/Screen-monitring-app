@@ -14,8 +14,10 @@ router.put(
 router.delete("/:id", checkemployee, userController.DeleteEmployee);
 //
 //---------------------------------------------------------------------------------
+//pending---------------
 router.get("/forgotpassword/:id", checkemployee, userController.ForgotPassword); //forgot password otp email
 router.post("/validate/", checkemployee, userController.VerifyOtp);
 router.put("/passwordupdate/:id", checkemployee, userController.PasswordUpdate);
+//pending---------------
 //
 module.exports = router;

@@ -4,7 +4,9 @@ const app = express();
 //
 const cors = require("cors");
 const port = process.env.PORT; //8000
-const GenuineToken = require("./allUrlsTokenAuth"); //token chk
+//const GenuineToken = require("./allUrlsTokenAuth"); //token chk
+const { GenuineToken } = require("./ApiMiddleware");
+
 // We support json requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,19 +35,24 @@ app.use(
 //console.log("Inside index.js");
 //
 app.get("/", (req, res) => {
-  res.send("Hello You are Welcome to Screen Monitoring App");
+  const Response = `<h1>"Hello You are Welcome to Screen Monitoring App."</h1>
+  <h2>This is test url to check whether server is working fine on port ${port}</h2>`;
+  res.send(Response);
 });
+//
+//-------------------------------------------------------------
+const userRouter = require("./routes/Employee");
+app.use("/employee", GenuineToken, userRouter);
 
-//PENDING-------------------------------------------------------------STARTS
 const accesstokenRouter = require("./routes/AccessToken");
 app.use("/accesstoken", GenuineToken, accesstokenRouter);
 
 const loginRouter = require("./routes/Login");
-app.use("/login", GenuineToken, loginRouter);
-//PENDING-------------------------------------------------------------ENDS
+app.use("/login", loginRouter);
 
-const userRouter = require("./routes/Employee");
-app.use("/employee", GenuineToken, userRouter);
+const logoutRouter = require("./routes/Logout");
+app.use("/logout", logoutRouter);
+//-------------------------------------------------------------
 
 const clientRouter = require("./routes/Client");
 app.use("/client", GenuineToken, clientRouter);
