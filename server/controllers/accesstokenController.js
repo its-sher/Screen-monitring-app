@@ -1,5 +1,3 @@
-var moment = require("moment");
-const con = require("../models/db");
 const bcrypt = require("bcrypt");
 const {
   accesstokencreation,
@@ -12,9 +10,9 @@ const {
   error_query,
 } = require("../helpers/instructions");
 const { base64encode, base64decode } = require("nodejs-base64");
-const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
+//const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
 //
-//console.log("Inside User controller");
+//console.log("Inside Access Token controller");
 const table_name = "employees";
 //
 //-------------------------------------------------------------------------------------------------------------

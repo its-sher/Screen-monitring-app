@@ -1,4 +1,3 @@
-const con = require("../models/db");
 const bcrypt = require("bcrypt");
 const {
   accesstokencreation,
@@ -9,8 +8,9 @@ const {
   edit_query,
   error_query,
 } = require("../helpers/instructions");
-console.log("Inside Login controller");
+var moment = require("moment");
 const table_name = "employees";
+console.log("Inside Login controller");
 //
 const Login = async (req, res) => {
   // console.log("Inside Login");
@@ -69,8 +69,12 @@ const Login = async (req, res) => {
               //creating access token and refresh token ------------STARTS
               const accesstoken = accesstokencreation(userId);
               //console.log(accesstoken);
+              const accesstokenexpiry = moment().add(1, "hours");
+              //console.log(accesstokenexpiry);
               const refreshtoken = refreshtokencreation(userId);
               // console.log(refreshtoken);
+              const refreshtokenexpiry = moment().add(1, "years");
+              //console.log(refreshtokenexpiry);
               //creating access token and refresh token ------------ENDS
               //
               let update_payload = {
@@ -79,7 +83,9 @@ const Login = async (req, res) => {
                 query_value: userId,
                 dataToSave: {
                   access_token: accesstoken,
+                  access_token_expires_in: accesstokenexpiry,
                   refresh_token: refreshtoken,
+                  refresh_token_expires_in: refreshtokenexpiry,
                 },
               };
               //
@@ -159,34 +165,7 @@ const Login = async (req, res) => {
   //
 };
 //-------------------------------------------------------------------------------------------------------------
-//Logout User
-const Logout = (req, res) => {
-  console.log("inside logout node");
-  res.clearCookie("logedIn");
-  res.clearCookie("sid");
-
-  console.log("inside logout node DONE");
-  res.status(200).send("DONE");
-  //res.status(200).redirect("/login"); //gets redirected unecessary to /login
-  //return res.status(200).end();
-  // req.session.destroy((err) => {
-  //   if (err) {
-  //     throw err;
-  //   } else {
-  //     //both below commands del session from db wd error
-  //     //solution--SET FOREIGN_KEY_CHECKS=0; -- to disable them
-  //     //cookie.set("testtoken", { expires: Date.now() });
-  //     //cookie.set("testtoken", { maxAge: 0 });
-  //     const Response = {
-  //       message: "Logout Successfull Session Destroyed",
-  //     };
-  //     res.status(200).json(Response);
-  //   }
-  // });
-};
-//-------------------------------------------------------------------------------------------------------------
 //
 module.exports = {
   Login,
-  Logout,
 };
