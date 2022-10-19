@@ -455,7 +455,7 @@ button#stop-btn {
     border-radius: 4px;
     cursor: pointer;
 }
-#start-btn{
+#start-btn,#start-resume{
     width: 100%;
     margin: 10px 0 10px 0;
     padding: 10px 0 10px 0;
@@ -518,4 +518,9 @@ a.AddTaskCancel {
     font-family: sans-serif;
     font-size: 15px;
     cursor: pointer;
+}
+.return-task{
+    display:flex;
+    justify-content: center;
+    align-items: center;
 }
