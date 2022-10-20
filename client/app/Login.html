@@ -9,7 +9,7 @@
 <div class="container loginform">
   <div class="Logo" style="text-align: center;">
       <img class="img-logo" src="https://ajivainfotech.com/wp-content/uploads/2019/07/cropped-derf-3.png" alt=""></div>
-       <form action="#" name="RegForm" id="errorMsg">
+       <form action="#" name="RegForm" id="Login_form">
         <div class="form-Main">
           <label for="email"><b>Username</b></label>
           <input type="text" placeholder="Enter Username" name="email" id="logName">
@@ -18,7 +18,7 @@
           <input type="password" placeholder="Enter Password" name="password" id="logPassword">
           
             
-          <button type="submit" value="Login" id="submit" onclick="validate()">Login</button>
+          <button type="submit" value="Login" id="submit" onclick="validate(),increase()">Login</button>
           <label>
             <input type="checkbox" checked="checked" name="remember"> Remember me
           </label>
@@ -26,59 +26,12 @@
           <p class="emailerror2"></p>
 
         </div>
-        <!--------PAYLOAD-->
-     
         <!-- <div class="container" style="background-color:#f1f1f1">
           <button type="button" style.display='none' class="cancelbtn">Cancel</button>
           <span class="psw">Forgot <a href="#">password?</a></span>
         </div> -->
 </form>
 </div>
-
-<script>
-
-  function validate(){
-  var logName = document.getElementById("logName").value;
-  var logPassword = document.getElementById("logPassword").value;
-  if (logName == "user" && logPassword == "12345"){
-  window.location.href = "index.html"; // Redirecting to other page.
-  return false;
-  }
-  else{
-  document.querySelector(".emailerror2").innerHTML = 'Please enter the correct Password';
-  // if( attempt ==3 ){
-  // document.getElementById("logName").disabled = false;
-  // document.getElementById("logPassword").disabled = false;
-  // document.getElementById("submit").disabled = true;
-  // return false;
-  // }
-  }
-  }
-  </script>
-  <script>
-    var value = {email:"",password:""};
-
-var options = {
-       url: 'http://localhost:3000/',
-       auth: {
-           user: user,
-           password: password
-       },
-       method :"POST",
-       json : value,
-
-   };
-
-   request(options, function (err, res, body) {
-       if (err) {
-           console.dir(err)
-           return
-       }
-       console.dir('headers', res.headers)
-       console.dir('status code', res.statusCode)
-       console.dir(body)
-   });
-  </script>
-
+<script src="script.js"></script>
 </body>
 </html>
