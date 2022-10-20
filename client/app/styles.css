@@ -1,526 +1,664 @@
-.container{
-margin: auto;
+body {
+    font-family: 'Poppins', sans-serif;
 }
+
+h4 {
+    margin: 0;
+    font-size: 20px;
+}
+
+p {
+    margin: 0;
+}
+
+.loginBody {
+    height: 90%;
+}
+
+.loginBody body {
+    height: 90%;
+    display: flex;
+    align-items: center;
+}
+
+.container {
+    margin: auto;
+}
+
 .refresh {
     display: flex;
     align-items: center;
 }
-.refresh i{
+
+.refresh i {
     color: #0075e3;
 }
-    input.search_task {
-        text-align: center;
-        font-size: 24px;
-        font-weight: 600;
-        font-family: sans-serif;
-        font-style: italic;
-        border: none;
-        color: black;
-        width: 100%;
-    }
 
+input.search_task {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    font-style: italic;
+    border: none;
+    color: black;
+    width: 100%;
+}
+    
 button.refresh {
     border: none;
     background: transparent;
-    color: #0075e3;
-    font-weight: 800;
+    color: #000248;
+    font-weight: 600;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
 }
-.Logout_btn{
-    background-color: #0075e3;
-    padding: 6px;
-    border-radius: 8px;
-    color:white;
+
+.Logout_btn {
+    background-color: #000248;
+    padding: 5px 15px 5px 15px;
+    color: #fff;
     text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
 }
+
 .headingrow {
     display: flex;
-        padding: 5px;
+    padding: 5px;
     justify-content: space-between;
     align-items: center;
 }
+
 .row{
-	border: none;
-	border-bottom: 2px solid #cdcccc;
+    border: none;
+    border-bottom: 2px solid #cdcccc;
 }
+
 .dashboard-text {
     text-align: center;
-    padding: 7px;
+    padding: 10px;
 }
+
 .dashboard-text1{
     text-align: center;
-        padding: 5px 0 5px 0;
+    padding: 5px 0 5px 0;
 }
+
 h4 {
     margin: 0;
     font-size: 24px;
-    font-family: sans-serif;
     font-style: italic;
 }
+
 p{
     margin: 0;
-    font-family: sans-serif;
 }
+
 i.fa.fa-plus-circle::before {
     font-size: 16px;
     color: #0079da;
     padding-left: 10px;
     cursor: pointer;
 }
+
 span.add_task {
     padding: 0 0 0 10px;
     font-size: 16px;
-    font-family: sans-serif;
     font-weight: 600;
-    color: #0079da;
+    color: #000248;
     cursor: pointer;
 }
-#input{
-	width: 40%;
-	padding: 6px 10px;
-    font-size: 17px;
-}
+
 .section2 .row.dashboard-text1 {
     display: flex;
 }
-button.search_icon {
-    width: 50px;
-    background: #0079da;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    margin: 0 5px 0 0;
-}
+
 #btn {
     border: none;
     padding: 10px 20px;
-    background:#0077de;
+    background:#3aa03b;
     color: white;
     width: 100%;
     cursor: pointer;
-    font-family: sans-serif;
-}
-.green{
-	color: green;
-	font-size: 20px;
+    font-size: 15px;
     font-weight: 600;
 }
+
+.green{
+    color: #3aa03b;
+    font-size: 20px;
+    font-weight: 600;
+}
+
 .red{
-	color: #ff0000;
-	font-size: 20px;
-	font-weight: 600;
+    color: #ff0000;
+    font-size: 20px;
+    font-weight: 600;
 }
+
 .orange{
-	color: #1000ff;
-	font-size: 20px;
-	font-weight: 600;
+    color: #1000ff;
+    font-size: 20px;
+    font-weight: 600;
 }
+
 .black{
-	color: black;
-	font-size: 20px;
-	font-weight: 600;
+    color: black;
+    font-size: 20px;
+    font-weight: 600;
 }
+
 .greentext{
-	color: green;
-	font-size: 14px;
+    color: #3aa03b;
+    font-size: 14px;
 }
+
 .redtext{
-	color: #ff0000;
-	font-size: 14px;
+    color: #ff0000;
+    font-size: 14px;
 }
+
 .orangetext{
-	color: #1000ff;
-	font-size: 14px;
+    color: #1000ff;
+    font-size: 14px;
 }
+
 .tasktext {
     padding: 8px 5px 8px 10px;
     background: #f1f1f1;
-    font-family: sans-serif;
     display: flex;
     justify-content: space-between;
 }
+
 .tasktext1 {
     padding: 8px 5px 8px 10px;
-    font-family: sans-serif;
     text-align: center;
     display: flex;
     justify-content: space-between;
 }
+
 .task-task {
     width: 33.3%;
     text-align: left;
 }
+
 .i_icon {
     width: 33.3%;
 }
+
 .videobtn {
     width: 33.3%;
 }
+
 i.fa.fa-file-o {
     padding: 0 5px 0 0;
 }
+
 .tasktext span {
     font-size: 18px;
 }
+
 .search-size {
     font-size: 26px;
-    font-family: ui-monospace;
     font-style: italic;
     color: #d1cadd;
     font-weight: 600;
 }
-.videobtn{
-	cursor: pointer;
-}
-i#clockicon {
+
+.videobtn, i#clockicon{
     cursor: pointer;
 }
+
 i#clockicon::before {
     cursor: pointer;
     font-size: 30px;
 }
+
 i#usericon::before {
     cursor: pointer;
     font-size: 30px!important;
 }
+
 .recent{
-	 padding: 8px 5px 8px 10px;
-    font-family: sans-serif;
+    padding: 8px 5px 8px 10px;
     display: flex;
     justify-content: space-between;
 }
-.btn1{
-    background: #0075e3;
-    border: none;
-    color: white;
-    border-radius: 7px;
-    padding: 7px 10px 7px 10px;
-}
+
 .footer {
-  display: flex;
-  padding: 10px;
-  border: 1px solid grey;
-  justify-content: space-evenly;
+    display: flex;
+    padding: 10px;
+    border: 1px solid grey;
+    justify-content: space-evenly;
 }
+
 .section2 {
     overflow: scroll;
     overflow-x: hidden;
     height: 250px;
 }
+
 input.recent_task {
     padding: 5px 0 5px 0;
     width: 100%;
     border: none;
 }
+
 .refresh {
     display: flex;
     align-items: center;
 }
+
 .refresh i{
-    color: #0075e3;
+    color: #000248;
 }
+
 input.search_task {
     text-align: center;
     font-size: 24px;
     font-weight: 600;
-    font-family: sans-serif;
     font-style: italic;
     border: none;
     color: rgb(0, 0, 0);
     width: 100%;
 }
-button.refresh {
-    border: none;
-    background: transparent;
-    color: #0075e3;
-    font-weight: 800;
-}
 
 .headingrow {
     display: flex;
-        padding: 5px;
+    padding: 5px;
     justify-content: space-between;
     align-items: center;
 }
+
 .row{
-	border: none;
-	border-bottom: 2px solid #cdcccc;
+    border: none;
+    border-bottom: 2px solid #cdcccc;
+    padding-bottom: 10px;
 }
+
 .dashboard-text {
     text-align: center;
     padding: 7px;
 }
+
 .dashboard-text1{
     text-align: center;
-        padding: 5px 0 5px 0;
+    padding: 5px 0 5px 0;
 }
-h4 {
-    margin: 0;
-    font-size: 24px;
-    font-family: sans-serif;
-    font-style: italic;
-}
-p{
-    margin: 0;
-    font-family: sans-serif;
-}
+
 i.fa.fa-plus-circle::before {
     font-size: 16px;
-    color: #0079da;
+    color: #000248;
     padding-left: 10px;
 }
+
 span.add_task {
     padding: 0 0 0 10px;
     font-size: 16px;
-    font-family: sans-serif;
     font-weight: 600;
-    color: #0079da;
+    color: #000248;
 }
+
 #input{
-	width: 40%;
-	padding: 6px 10px;
+    width: 50%;
+    padding: 6px 10px;
     font-size: 17px;
 }
+
 .section2 .row.dashboard-text1 {
     display: flex;
 }
+
 button.search_icon {
     width: 50px;
-    background: #0079da;
+    background: #000248;
     border: none;
-    border-radius: 4px;
     margin: 0 5px 0 0;
+    color: #fff;
 }
-#btn {
-    border: none;
-    padding: 10px 20px;
-    background:#0077de;
-    color: white;
-    width: 100%;
-    cursor: pointer;
-    font-family: sans-serif;
-}
+
 .green{
-	color: green;
-	font-size: 20px;
+    color: #3aa03b;
+    font-size: 14px;
     font-weight: 600;
 }
+
 .red{
-	color: #ff0000;
-	font-size: 20px;
-	font-weight: 600;
+    color: #ff0000;
+    font-size: 14px;
+    font-weight: 600;
 }
+
 .orange{
-	color: #1000ff;
-	font-size: 20px;
-	font-weight: 600;
+    color: #1000ff;
+    font-size: 14px;
+    font-weight: 600;
 }
+
 .black{
-	color: black;
-	font-size: 20px;
-	font-weight: 600;
+    color: black;
+    font-size: 14px;
+    font-weight: 600;
 }
+
 .greentext{
-	color: green;
-	font-size: 14px;
+    color: #3aa03b;
+    font-size: 14px;
 }
+
 .redtext{
-	color: #ff0000;
-	font-size: 14px;
+    color: #ff0000;
+    font-size: 14px;
 }
+
 .orangetext{
-	color: #1000ff;
-	font-size: 14px;
+    color: #1000ff;
+    font-size: 14px;
 }
+
 .tasktext {
     padding: 8px 5px 8px 10px;
     background: #f1f1f1;
-    font-family: sans-serif;
     display: flex;
     justify-content: space-between;
 }
+
 .tasktext1 {
     padding: 8px 5px 8px 10px;
-    font-family: sans-serif;
     text-align: center;
     display: flex;
     justify-content: space-between;
 }
+
 .task-task {
     width: 33.3%;
     text-align: left;
 }
+
 .i_icon {
     width: 33.3%;
 }
+
 .videobtn {
     width: 33.3%;
 }
+
 i.fa.fa-file-o {
     padding: 0 5px 0 0;
 }
+
 .tasktext span {
     font-size: 18px;
 }
+
 .search-size {
     font-size: 26px;
-    font-family: ui-monospace;
     font-style: italic;
     color: #884ef3;
     font-weight: 600;
 }
+
 .videobtn{
-	cursor: pointer;
+    cursor: pointer;
+    color: #000248;
 }
+
 i#clockicon {
     cursor: pointer;
 }
+
 i#clockicon::before {
     cursor: pointer;
     font-size: 30px;
 }
+
 i#usericon::before {
     cursor: pointer;
     font-size: 30px!important;
 }
+
 .recent{
-	 padding: 8px 5px 8px 10px;
-    font-family: sans-serif;
+    padding: 8px 5px 8px 10px;
     display: flex;
     justify-content: space-between;
 }
+
 .btn1{
-    background: #0075e3;
-    border: none;
+    background-color: #000248;
+    padding: 5px 15px 5px 15px;
     color: white;
-    border-radius: 7px;
-    padding: 7px 10px 7px 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
 }
+
 .footer {
-  display: flex;
-  padding: 10px;
-  border: 1px solid grey;
-  justify-content: space-evenly;
+    display: flex;
+    padding: 10px;
+    border: 1px solid grey;
+    justify-content: space-evenly;
 }
+
 .section2 {
     overflow: scroll;
     overflow-x: hidden;
     height: 250px;
 }
+
 .i_icon i.fa.fa-info-circle {
     cursor: pointer;
+    color: #000248;
 }
+
 input.recent_task {
     padding: 5px 0 5px 0;
     width: 100%;
     border: none;
 }
+
 #count_up_timer{
-	font-size: 100px;
-	font-weight: bold;
-	color: darkblue;
+    font-size: 100px;
+    font-weight: bold;
+    color: darkblue;
 }
+
 #stop_count_up_timer{
-	background-color:black;
-	color:white
+    background-color:black;
+    color:white
 }
+
 .maincontainer {
     text-align: center;
 }
+
 .section1_ {
     border-bottom: 2px solid lightgray;
-    color: green;
+    color: #3aa03b;
     font-size: 16px;
 }
+
 .section2_ {
     border-bottom: 2px solid lightgrey;
     padding: 0 0 10px 0;
 }
+
 .section3_ {
     padding: 15px 0 15px 0;
     border-bottom: 2px solid lightgrey;
 }
+
 .section4_ {
     padding: 15px 0 15px 0;
     border-bottom: lightgrey 2px solid;
 }
-button#stop-btn {
+
+#start-btn, #start-resume, #stop-btn {
     width: 100%;
-    margin: 10px 0 10px 0;
+    margin: 12px 0 12px 0;
     padding: 10px 0 10px 0;
-    font-size: 20px;
+    font-size: 15px;
     border: none;
     color: white;
-    background: royalblue;
-    font-weight: 700;
-    border-radius: 4px;
+    background: #000248;
+    font-weight: 600;
+    border-radius: 0px;
     cursor: pointer;
 }
-#start-btn,#start-resume{
-    width: 100%;
-    margin: 10px 0 10px 0;
-    padding: 10px 0 10px 0;
-    font-size: 20px;
-    border: none;
-    color: white;
-    background: royalblue;
-    font-weight: 700;
-    border-radius: 4px;
-    cursor: pointer;
+
+#stop-btn {
+    background: red;
 }
+
 .section5_ {
     border-top: 2px solid lightgrey;
     border-bottom: 2px solid lightgrey;
     padding: 25px 0 25px 0;
 }
+
 .section6_ {
     padding: 15px 0 0 0;
 }
+
 .section6_ textarea#Notes {
     margin: 10px 0 0 0;
+    width: 80%;
 }
+
 div#watch_timer {
     display: flex;
     justify-content: center;
     font-size: 22px;
     font-weight: 800;
+    margin: 10px 0 10px 0;
 }
+
 div#first-timer {
     padding: 0 15px 0 0px;
 }
 div#second-timer {
     padding: 0 15px 0 0px;
 }
+
 .AddTaskInput input {
     width: 40%;
     padding: 6px 10px;
     font-size: 17px;
 }
+
 span.plus_icon {
     cursor: pointer;
 }
+
 .InnerAddTaskInput {
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 a.AddTaskSave {
-    color: blue;
+    color: #000248;
     font-weight: bold;
     margin: 0 10px 0 10px;
-    font-family: sans-serif;
     font-size: 15px;
     cursor: pointer;
 }
+
 a.AddTaskCancel {
     color: red;
     font-weight: bold;
     margin: 0 10px 0 10px;
-    font-family: sans-serif;
     font-size: 15px;
     cursor: pointer;
 }
+
 .return-task{
     display:flex;
     justify-content: center;
     align-items: center;
+}
+
+.loginform input[type=text], .loginform input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.loginform button {
+    background-color: #000248;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+.loginform button a {
+    color:white;
+    text-decoration: none;
+}
+
+.loginform button:hover {
+    opacity: 0.8;
+}
+
+.loginform .cancelbtn {
+    width: auto;
+    padding: 10px 18px;
+    background-color: #f44336;
+}
+
+.loginform .imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+.loginform span.psw {
+    float: right;
+    padding-top: 16px;
+}
+
+.loginform .emailerror2{
+    color: red;
+}
+
+.Timertitle {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.loginform .img-logo{
+    width:200px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.loginform .form-Main {
+    padding: 0 20px 0 20px;
+}
+
+.Project_name h4 {
+    color: #000248;
+}
+
+a.btn1 i, a.Logout_btn i {
+    font-size: 14px;
+}
+
+
+@media screen and (max-width: 300px) {
+    .loginform span.psw {
+        display: block;
+        float: none;
+    }
+    .loginform .cancelbtn {
+        width: 100%;
+    }
 }

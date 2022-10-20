@@ -1,15 +1,12 @@
 const { app, BrowserWindow } = require('electron')
+
 function createWindow () {
 	let mainWindow = new BrowserWindow({
-		width: 550,
-		height: 650,
+		width: 500,
+		height: 640,
 		icon:'app/icon.png',
-		webPreferences: {
-		  nodeIntegration: true
-		}
 	  });
-	mainWindow.loadFile('./app/login.html');
-	mainWindow.setMenuBarVisibility(true);
+	mainWindow.loadFile('./app/Login.html');
 	mainWindow.setResizable(false);
 }
 app.whenReady().then(createWindow);
