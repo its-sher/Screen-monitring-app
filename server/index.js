@@ -11,14 +11,12 @@ const { GenuineToken } = require("./ApiMiddleware");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //
-const con = require("./models/db"); //for db connection
-//
 //to get attachments via url++++++++++++++++++++++++++++++++STARTS
 app.use("/uploads", express.static("uploads"));
 //to get attachments via url++++++++++++++++++++++++++++++++ENDS
 //
 //CORS --Allow cors everywhere
-app.use(cors());
+//app.use(cors());
 //specific
 app.use(
   cors({
@@ -27,7 +25,7 @@ app.use(
       //    process.env.CORS_ORIGIN2,
       //  process.env.CORS_ORIGIN3,
       //process.env.CORS_ORIGIN4,
-    ], //3000 frontend and 5000backend
+    ], //3000 frontend and 8000backend
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
@@ -40,7 +38,7 @@ app.get("/", (req, res) => {
   res.send(Response);
 });
 //
-//-------------------------------------------------------------
+//--------------ROUTES-----------------------------------------------------------------------------------------
 const userRouter = require("./routes/Employee");
 app.use("/employee", GenuineToken, userRouter);
 
@@ -51,7 +49,7 @@ const loginRouter = require("./routes/Login");
 app.use("/login", loginRouter);
 
 const logoutRouter = require("./routes/Logout");
-app.use("/logout", logoutRouter);
+app.use("/logout", GenuineToken, logoutRouter);
 //-------------------------------------------------------------
 
 const clientRouter = require("./routes/Client");
