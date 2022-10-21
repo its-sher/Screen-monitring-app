@@ -6,19 +6,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="container loginform">
+<div class="container loginform" id="formDiv">
   <div class="Logo" style="text-align: center;">
       <img class="img-logo" src="https://ajivainfotech.com/wp-content/uploads/2019/07/cropped-derf-3.png" alt=""></div>
        <form action="#" name="RegForm" id="Login_form">
         <div class="form-Main">
-          <label for="email"><b>Username</b></label>
-          <input type="text" placeholder="Enter Username" name="email" id="logName">
-    
-          <label for="password"><b>Password</b></label>
-          <input type="password" placeholder="Enter Password" name="password" id="logPassword">
-          
-            
-          <button type="submit" value="Login" id="submit" onclick="validate(),increase()">Login</button>
+          <label for="email" class="sr-only"><b>Username</b></label>
+          <input type="text" placeholder="Enter Username" name="email" id="logName"required autofocus>
+
+          <label for="password" class="sr-only"><b>Password</b></label>
+          <input type="password" placeholder="Enter Password" name="password" id="logPassword"required autofocus>
+          <button type="submit" id="submit" onclick="validate(),increase()">Login</button>
           <label>
             <input type="checkbox" checked="checked" name="remember"> Remember me
           </label>
@@ -26,12 +24,9 @@
           <p class="emailerror2"></p>
 
         </div>
-        <!-- <div class="container" style="background-color:#f1f1f1">
-          <button type="button" style.display='none' class="cancelbtn">Cancel</button>
-          <span class="psw">Forgot <a href="#">password?</a></span>
-        </div> -->
 </form>
 </div>
 <script src="script.js"></script>
+<script src="session.js"></script>
 </body>
 </html>

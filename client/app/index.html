@@ -8,8 +8,8 @@
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 	<title>Teamlogger Login</title>
 </head>
-<body>
-	<a href="Timer.html">Timer Page</a>
+<body onload="myFunction()">
+	<!-- <a href="Timer.html">Timer Page</a> -->
 <div class="main-wrapper">
 	<div class="row headingrow">
 		<div class="refresh">
@@ -18,9 +18,11 @@
 	</div>
 	<div class="report">
 		<a class="btn1"><i class="fa fa-file-o" aria-hidden="true"></i>My Report</a>
-		<a href="Login.html" class="Logout_btn"><i class="fa fa-sign-out" aria-hidden="true"></i>
+		<!-- <a href="Login.html" id="LogoutSession" class="Logout_btn"><i class="fa fa-sign-out" aria-hidden="true" ></i>
         Log out
-        </a>
+        </a> -->
+		<!-- <button type="submit" id="LogoutSession" class="Logout_btn">Logout</button> -->
+		<button type="submit" id="removeButton"class="Logout_btn" onclick="hello()">Logout</button>
 		</div>
 	</div>
 	<div class="row dashboard-text flex">
@@ -59,14 +61,14 @@
 			<td class="orangetext Timertitle">Total</td>
 		  </tr>
 		  <tr>
-		    <td style="font-size: 16px;font-weight: 800;">Day</td>
+		    <td style="font-size: 12px;font-weight: 600;">Day</td>
 		    <td class="green">00h 00m</td>
 		    <td class="red">00h 00m</td>
 		    <td class="orange">00h 00m</td>
 		    <td class="black">00h 00m</td>
 		  </tr>
 		    <tr>
-		    <td style="font-size: 16px;font-weight: 800;">Week</td>
+		    <td style="font-size: 12px;font-weight: 600;">Week</td>
 		    <td class="green">00h 00m</td>
 		    <td class="red">00h 00m</td>
 		    <td class="orange">00h 00m</td>
@@ -81,7 +83,7 @@
 	<div class="row tasktext">
 	<div class="recent_task">Recently Active Task</div>
 	</div>
-	<div class="row dashboard-text1">
+	<div class="row dashboard-text1" style="padding: 0;">
 		<input type="text" placeholder="SEARCH TASKS" class="search_task">
 		<button class="search_icon" type="submit"><i class="fa fa-search"></i></button>
 	</div>
@@ -89,7 +91,7 @@
 		<div class="task-task">Default Task
 			<p>Ezmoov Dashboard</p>
 		</div>
-		<div class="i_icon"><span style="font-size: 20px;"><i class="fa fa-info-circle" aria-hidden="true"></i>
+		<div class="i_icon"><span style="font-size: 16px;"><i class="fa fa-info-circle" aria-hidden="true"></i>
 		</span></div>
 		<div class="videobtn"><i class="fa fa-play"></i></div>
 		
@@ -98,7 +100,7 @@
 		<div class="task-task">Default Task
 			<p>Default Project</p>
 		</div>
-		<div class="i_icon"><span style="font-size: 20px;"><i class="fa fa-info-circle" aria-hidden="true"></i>
+		<div class="i_icon"><span style="font-size: 16px;"><i class="fa fa-info-circle" aria-hidden="true"></i>
 		</span></div>
 		<div class="videobtn"><i class="fa fa-play"></i></div>
 		
@@ -114,41 +116,7 @@
 
 </div>
 </div>
-<script>
-	function refreshPage(){
-    window.location.reload();
-} 
-</script>
-<script>
-
-	function Timer(){
-	var btn = document.getElementById("btn").value;
-	{
-	window.location.href = "Timer.html"; // Redirecting to other page.
-	}};
-	// function update() {
-	// 	var select = document.getElementById('input');
-	// 	var option = select.options[select.selectedIndex];
-	// 	document.getElementById('value').value = option.value;
-	// }
-	// update();
-	</script>
-	<script>
-		function plus_icon() {
-			document.querySelector(".AddTaskInput").style.display = "block";
-			document.querySelector("#input").style.display = "none";
-			document.querySelector(".plus_icon").style.display = "none";
-		}
-
-		function AddTaskCancel() {
-			document.querySelector(".AddTaskInput").style.display = "none";
-			document.querySelector("#input").style.display = "block";
-			document.querySelector(".plus_icon").style.display = "block";
-		}
-
-		function AddTaskInput() {
-			document.querySelector(".AddTaskSave").style.display = "block";
-		}
-	</script>
+	<script src="session.js"></script>
+	<script src="script.js"></script>
 </body>
 </html>

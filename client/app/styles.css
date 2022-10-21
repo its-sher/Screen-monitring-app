@@ -1,14 +1,10 @@
 body {
     font-family: 'Poppins', sans-serif;
-}
-
-h4 {
     margin: 0;
-    font-size: 20px;
 }
 
 p {
-    margin: 0;
+    margin: 0 8px 0 8px;
 }
 
 .loginBody {
@@ -36,7 +32,7 @@ p {
 
 input.search_task {
     text-align: center;
-    font-size: 24px;
+    font-size: 16px;
     font-weight: 600;
     font-style: italic;
     border: none;
@@ -49,16 +45,16 @@ button.refresh {
     background: transparent;
     color: #000248;
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
     font-family: 'Poppins', sans-serif;
 }
 
 .Logout_btn {
     background-color: #000248;
-    padding: 5px 15px 5px 15px;
+    padding: 5px 12px 5px 12px;
     color: #fff;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
 }
 
@@ -76,7 +72,7 @@ button.refresh {
 
 .dashboard-text {
     text-align: center;
-    padding: 10px;
+    padding: 5px 0 5px 0;
 }
 
 .dashboard-text1{
@@ -86,12 +82,13 @@ button.refresh {
 
 h4 {
     margin: 0;
-    font-size: 24px;
+    font-size: 16px;
     font-style: italic;
 }
 
 p{
     margin: 0;
+    font-size: 14px;
 }
 
 i.fa.fa-plus-circle::before {
@@ -126,25 +123,13 @@ span.add_task {
 
 .green{
     color: #3aa03b;
-    font-size: 20px;
+    font-size: 12px;
     font-weight: 600;
 }
 
 .red{
     color: #ff0000;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.orange{
-    color: #1000ff;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.black{
-    color: black;
-    font-size: 20px;
+    font-size: 12px;
     font-weight: 600;
 }
 
@@ -158,18 +143,6 @@ span.add_task {
     font-size: 14px;
 }
 
-.orangetext{
-    color: #1000ff;
-    font-size: 14px;
-}
-
-.tasktext {
-    padding: 8px 5px 8px 10px;
-    background: #f1f1f1;
-    display: flex;
-    justify-content: space-between;
-}
-
 .tasktext1 {
     padding: 8px 5px 8px 10px;
     text-align: center;
@@ -180,6 +153,11 @@ span.add_task {
 .task-task {
     width: 33.3%;
     text-align: left;
+    font-size: 12px !important;
+}
+
+.task-task p {
+    font-size: 12px !important;
 }
 
 .i_icon {
@@ -188,14 +166,11 @@ span.add_task {
 
 .videobtn {
     width: 33.3%;
+    font-size: 16px;
 }
 
 i.fa.fa-file-o {
     padding: 0 5px 0 0;
-}
-
-.tasktext span {
-    font-size: 18px;
 }
 
 .search-size {
@@ -235,7 +210,7 @@ i#usericon::before {
 .section2 {
     overflow: scroll;
     overflow-x: hidden;
-    height: 250px;
+    height: 200px;
 }
 
 input.recent_task {
@@ -253,16 +228,6 @@ input.recent_task {
     color: #000248;
 }
 
-input.search_task {
-    text-align: center;
-    font-size: 24px;
-    font-weight: 600;
-    font-style: italic;
-    border: none;
-    color: rgb(0, 0, 0);
-    width: 100%;
-}
-
 .headingrow {
     display: flex;
     padding: 5px;
@@ -276,14 +241,10 @@ input.search_task {
     padding-bottom: 10px;
 }
 
-.dashboard-text {
-    text-align: center;
-    padding: 7px;
-}
-
 .dashboard-text1{
     text-align: center;
     padding: 5px 0 5px 0;
+    font-size: 14px;
 }
 
 i.fa.fa-plus-circle::before {
@@ -294,15 +255,15 @@ i.fa.fa-plus-circle::before {
 
 span.add_task {
     padding: 0 0 0 10px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     color: #000248;
 }
 
 #input{
     width: 50%;
-    padding: 6px 10px;
-    font-size: 17px;
+    padding: 4px 8px;
+    font-size: 14px;
 }
 
 .section2 .row.dashboard-text1 {
@@ -310,44 +271,29 @@ span.add_task {
 }
 
 button.search_icon {
-    width: 50px;
+    width: 30px;
     background: #000248;
     border: none;
-    margin: 0 5px 0 0;
+    margin: 3px 5px 3px 0;
     color: #fff;
-}
-
-.green{
-    color: #3aa03b;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.red{
-    color: #ff0000;
-    font-size: 14px;
-    font-weight: 600;
+    padding: 7px 0px 7px 0;
+    border-radius: 50%;
 }
 
 .orange{
     color: #1000ff;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
 }
 
 .black{
     color: black;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
 }
 
 .greentext{
     color: #3aa03b;
-    font-size: 14px;
-}
-
-.redtext{
-    color: #ff0000;
     font-size: 14px;
 }
 
@@ -357,22 +303,11 @@ button.search_icon {
 }
 
 .tasktext {
-    padding: 8px 5px 8px 10px;
+    padding: 4px 10px 4px 10px;
     background: #f1f1f1;
     display: flex;
     justify-content: space-between;
-}
-
-.tasktext1 {
-    padding: 8px 5px 8px 10px;
-    text-align: center;
-    display: flex;
-    justify-content: space-between;
-}
-
-.task-task {
-    width: 33.3%;
-    text-align: left;
+    font-size: 14px;
 }
 
 .i_icon {
@@ -388,7 +323,7 @@ i.fa.fa-file-o {
 }
 
 .tasktext span {
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .search-size {
@@ -425,10 +360,10 @@ i#usericon::before {
 
 .btn1{
     background-color: #000248;
-    padding: 5px 15px 5px 15px;
+    padding: 5px 12px 5px 12px;
     color: white;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -438,12 +373,6 @@ i#usericon::before {
     padding: 10px;
     border: 1px solid grey;
     justify-content: space-evenly;
-}
-
-.section2 {
-    overflow: scroll;
-    overflow-x: hidden;
-    height: 250px;
 }
 
 .i_icon i.fa.fa-info-circle {
@@ -486,24 +415,26 @@ input.recent_task {
 .section3_ {
     padding: 15px 0 15px 0;
     border-bottom: 2px solid lightgrey;
+    font-size: 14px;
 }
 
 .section4_ {
     padding: 15px 0 15px 0;
     border-bottom: lightgrey 2px solid;
+    font-size: 14px;
 }
 
 #start-btn, #start-resume, #stop-btn {
-    width: 100%;
+    width: 90%;
     margin: 12px 0 12px 0;
-    padding: 10px 0 10px 0;
-    font-size: 15px;
-    border: none;
-    color: white;
     background: #000248;
-    font-weight: 600;
     border-radius: 0px;
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 #stop-btn {
@@ -513,11 +444,14 @@ input.recent_task {
 .section5_ {
     border-top: 2px solid lightgrey;
     border-bottom: 2px solid lightgrey;
-    padding: 25px 0 25px 0;
+    padding: 10px 0 10px 0;
 }
-
+.section1_ h2 {
+    margin: 7px;
+    font-size: 14px;
+}
 .section6_ {
-    padding: 15px 0 0 0;
+    padding: 9px 0 0 0;
 }
 
 .section6_ textarea#Notes {
@@ -528,9 +462,9 @@ input.recent_task {
 div#watch_timer {
     display: flex;
     justify-content: center;
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
-    margin: 10px 0 10px 0;
+    margin: 6px 0 6px 0;
 }
 
 div#first-timer {
@@ -630,7 +564,7 @@ a.AddTaskCancel {
 
 .Timertitle {
     font-weight: 600;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .loginform .img-logo{
@@ -650,6 +584,10 @@ a.AddTaskCancel {
 
 a.btn1 i, a.Logout_btn i {
     font-size: 14px;
+}
+.section2_ h3 {
+    font-size: 14px;
+    margin: 8px 0 8px 0;
 }
 
 
