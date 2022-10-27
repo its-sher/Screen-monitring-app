@@ -1,97 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles.css">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Timer</title>
-</head>
-<body>
+  </head>
+  <body>
     <!-- <a href="index.html">Index</a> -->
     <div class="maincontainer">
-        <div class="section1_">
-            <h2>Time Running</h2>
-    </div>
-<div class="section2_">
-    <h3>Default Task</h3>
-    <h4  id="value">HagglerPlanet</h4>
-    <div id="watch_timer">
-    <div id="first-timer"> <span id="hour"></span>	&#32;hours</div>
-<div id="second-timer"><span id="minute"></span>	&#32;minutes</div>
-<div id="third-timer"><span id="seconds"></span>	&#32;sec</div>
-</div>
+      <div class="section1_">
+        <h2>Time Running</h2>
+      </div>
+      <div class="section2_">
+        <h3>Default Task</h3>
+        <h4 id="value">HagglerPlanet</h4>
+        <div id="watch_timer">
+          <div id="first-timer"><span id="hour"></span> &#32;hours</div>
+          <div id="second-timer"><span id="minute"></span> &#32;minutes</div>
+          <div id="third-timer"><span id="seconds"></span> &#32;sec</div>
+        </div>
         <p>since timer start</p>
-</div>
-<div class="section3_">
-<p >Offline Mode</p>
-<p>day total time unavailable in Offline mode</p>
-</div>
-<div class="section4_">
-    Connect to the Internet and stop the timer to switch back to Online Mode.
-</div>
-<button id="start-btn" onclick="pause()">Pause</button>
-<button id="start-resume" onclick="resume()" style="display: none;">Resume</button>
-<button id="stop-btn" onclick="stop()" style="margin-top: 0;">End Task</button>
-<div class="section5_">
-    <p>View Task Notes</p>
-</div>
-<div class="section6_">
-    <p>Enter Session Notes Below</p>
-   <textarea id="Notes" cols="30" rows="2"></textarea>
-</div>
+      </div>
+      <div class="section3_">
+        <p>Offline Mode</p>
+        <p>day total time unavailable in Offline mode</p>
+      </div>
+      <div class="section4_">
+        Connect to the Internet and stop the timer to switch back to Online
+        Mode.
+      </div>
+      <button id="start-btn" onclick="pause()">Pause</button>
+      <button id="start-resume" onclick="resume()" style="display: none">
+        Resume
+      </button>
+      <button id="stop-btn" onclick="stop()" style="margin-top: 0">
+        End Task
+      </button>
+      <div class="section5_">
+        <p>View Task Notes</p>
+      </div>
+      <div class="section6_">
+        <p>Enter Session Notes Below</p>
+        <textarea id="Notes" cols="30" rows="2"></textarea>
+      </div>
     </div>
+  </body>
+  <script>
+    window.onload = () => {
+      let hour = 0;
+      let minute = 0;
+      let seconds = 0;
+      let totalSeconds = 0;
 
-</body>
-<script>
-   window.onload = () => {
-  let hour = 0;
-  let minute = 0;
-  let seconds = 0;
-  let totalSeconds = 0;
+      let intervalId = null;
 
-  let intervalId = null;
+      intervalId = setInterval(startTimer, 1000);
+      function startTimer() {
+        ++totalSeconds;
+        hour = Math.floor(totalSeconds / 3600);
+        minute = Math.floor((totalSeconds - hour * 3600) / 60);
+        seconds = totalSeconds - (hour * 3600 + minute * 60);
 
-intervalId = setInterval(startTimer, 1000);
-  function startTimer() {
-    ++totalSeconds;
-    hour = Math.floor(totalSeconds / 3600);
-    minute = Math.floor((totalSeconds - hour * 3600) / 60);
-    seconds = totalSeconds - (hour * 3600 + minute * 60);
+        document.getElementById("hour").innerHTML = hour;
+        document.getElementById("minute").innerHTML = minute;
+        document.getElementById("seconds").innerHTML = seconds;
+      }
 
-    document.getElementById("hour").innerHTML = hour;
-    document.getElementById("minute").innerHTML = minute;
-    document.getElementById("seconds").innerHTML = seconds;
-  }
+      document.getElementById("stop-btn").addEventListener("click", () => {
+        if (intervalId) clearInterval(intervalId);
+      });
 
-  document.getElementById('stop-btn').addEventListener('click', () => {
-    if (intervalId)
-      clearInterval(intervalId);
-  });
+      document.getElementById("start-btn").addEventListener("click", () => {
+        if (intervalId) clearInterval(intervalId);
+      });
 
-  document.getElementById('start-btn').addEventListener('click', () => {
-    if (intervalId)
-      clearInterval(intervalId);
-  });
+      document.getElementById("start-resume").addEventListener("click", () => {
+        intervalId = setInterval(startTimer, 1000);
+      });
+    };
+    function stop() {
+      window.location.href = "index.html";
+    }
 
-  document.getElementById('start-resume').addEventListener('click', () => {
-    intervalId = setInterval(startTimer, 1000);
-  });
-    
-};
-function stop() {
-    window.location.href=("index.html");
-}
-
-
-function pause() {
-			document.querySelector("#start-btn").style.display = "none";
-			document.querySelector("#start-resume").style.display = "block";
-		}
-        function resume() {
-			document.querySelector("#start-btn").style.display = "block";
-			document.querySelector("#start-resume").style.display = "none";
-		}
-</script>
-
+    function pause() {
+      document.querySelector("#start-btn").style.display = "none";
+      document.querySelector("#start-resume").style.display = "block";
+    }
+    function resume() {
+      document.querySelector("#start-btn").style.display = "block";
+      document.querySelector("#start-resume").style.display = "none";
+    }
+  </script>
 </html>
