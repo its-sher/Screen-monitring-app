@@ -58,6 +58,13 @@ app.use("/client", GenuineToken, clientRouter);
 const projectRouter = require("./routes/Project");
 app.use("/project", GenuineToken, projectRouter);
 
+const taskRouter = require("./routes/Task");
+app.use(
+  "/task",
+  //GenuineToken,
+  taskRouter
+);
+
 const logsRouter = require("./routes/Logs");
 app.use("/logs", logsRouter);
 

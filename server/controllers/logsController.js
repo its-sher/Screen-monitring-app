@@ -1,6 +1,7 @@
 var moment = require("moment");
 const con = require("../models/db");
 const {
+  sql_query,
   add_query,
   view_query,
   edit_query,
@@ -10,6 +11,7 @@ const {
 } = require("../helpers/instructions");
 //
 //console.log("Inside Log Controller");
+const domainpath = process.env.REACT_APP_DOMAIN_ENDPOINT;
 const table_name = "logs";
 //
 //-------------------------------------------------------------------------------------------------------------
@@ -23,8 +25,10 @@ const CreateLog = async (req, res) => {
   if (
     dataLogTable.employee_id &&
     dataLogTable.employee_id > 0 &&
-    dataLogTable.attachment_name &&
-    dataLogTable.attachment_name.length > 0 &&
+    dataLogTable.attachment_title &&
+    dataLogTable.attachment_title.length > 0 &&
+    dataLogTable.attachment_url &&
+    dataLogTable.attachment_url.length > 0 &&
     dataLogTable.data_time &&
     dataLogTable.activity_grade
   ) {
@@ -36,61 +40,142 @@ const CreateLog = async (req, res) => {
     );
     // console.log(filteredData);
     //
-    //STEP_1---createLog and get data----------------STARTS
-    //------------------------------------------------------
-    async function createLog(saveData) {
-      console.log("Inside createLog");
+    //STEP_0---createAttachment and return id----------------STARTS
+    //
+    //collect data for attachment===starts
+    var attachment_data = {};
+    attachment_data["title"] = filteredData.attachment_title;
+    delete filteredData.attachment_title;
+    attachment_data["url"] = filteredData.attachment_url;
+    //condition if more than one then make it one string ---starts
+    const imagesArray = filteredData.attachment_url;
+    if (imagesArray.length > 1) {
+      var imagesString = imagesArray.join(",");
+      //console.log(imagesString);
+      attachment_data["url"] = imagesString;
+    } else {
+      attachment_data["url"] = filteredData.attachment_url;
+    }
+    //condition if more than one then make it one string ---ends
+    delete filteredData.attachment_url;
+    //collect data for attachment===ends
+    //
+    //console.log(attachment_data);
+    async function createAttachment(saveData) {
+      console.log("Inside createAttachment");
       //   console.log(saveData);
       //
       let add_payload = {
-        table_name: table_name,
+        table_name: "attachment",
         dataToSave: saveData,
       };
       //console.log(add_payload);
       const respAdd = await add_query(add_payload);
-      console.log("Back 1");
+      console.log("Back 0");
       //console.log(respAdd);
       if (respAdd.status == "success") {
         //console.log("Success Log Created");
         const id = respAdd.id;
+        filteredData["attachment_id"] = id;
         //
-        //Get data for created Log-------------STARTS++++++++++++++++++++++
-        let view_payload = {
-          table_name: table_name,
-          dataToGet:
-            "id, employee_id, attachment_name, data_time, activity_grade",
-          query_field: "id",
-          query_value: id,
-        };
-        const respView = await view_query(view_payload);
-        console.log("Back 2");
-        //console.log(respView);
-        if (respView.status == "success") {
-          //console.log("Success Log Data Got");
-          const Response = {
-            message: respView.status,
-            responsedata: { log: respView.data },
+        //STEP_1---createLog and get data----------------STARTS
+        //------------------------------------------------------
+        async function createLog(saveData) {
+          console.log("Inside createLog");
+          //   console.log(saveData);
+          //
+          let add_payload = {
+            table_name: table_name,
+            dataToSave: saveData,
           };
-          res.status(201).json(Response);
-        } else if (respView.status == "error") {
-          //console.log("Error");
-          const err = respAdd.message;
-          const respError = await error_query(err);
-          console.log("Back 2-E");
-          //console.log(respError);
-          const Error = {
-            status: "error",
-            message: respError.message,
-          };
-          res.status(respError.statusCode).json(Error);
+          //console.log(add_payload);
+          const respAdd = await add_query(add_payload);
+          console.log("Back 1");
+          //console.log(respAdd);
+          if (respAdd.status == "success") {
+            //console.log("Success Log Created");
+            const id = respAdd.id;
+            //
+            //Get data for created Log-------------STARTS++++++++++++++++++++++
+            let sql_query_payload = {
+              sql_script:
+                "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.data_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id WHERE l.id=",
+              sql_values: id,
+            };
+            const respView = await sql_query(sql_query_payload);
+            console.log("Back 2");
+            // console.log(respView);
+            if (respView.status == "success") {
+              //console.log("Success Log Data Got");
+              //
+              //removing row data packet-------------STARTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              var resultArray = Object.values(
+                JSON.parse(JSON.stringify(respView.data))
+              );
+              //console.log(resultArray);
+              //removing row data packet-------------ENDS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/
+              //
+              //HANDLING IMAGES ---starts
+              const strdata = resultArray[0].attachment_url;
+              console.log(strdata);
+              //if images is not null then convert to array and then concat
+              if (strdata != null) {
+                // console.log("hello");
+                let var1 = strdata.split(","); //array made
+                //concat in array
+                let var2 = var1.map((item1) => {
+                  return domainpath.concat(item1);
+                });
+                // console.log(var2);
+                //delete item.images;//didnt req as it overwrites data
+                resultArray[0].attachment_url = var2; //put new data to images.item
+                //
+              }
+              //HANDLING IMAGES ---ends
+              //
+              const Response = {
+                message: respView.status,
+                responsedata: { log: resultArray },
+              };
+              res.status(201).json(Response);
+            } else if (respView.status == "error") {
+              //console.log("Error");
+              const err = respAdd.message;
+              const respError = await error_query(err);
+              console.log("Back 2-E");
+              //console.log(respError);
+              const Error = {
+                status: "error",
+                message: respError.message,
+              };
+              res.status(respError.statusCode).json(Error);
+            }
+            //Get data for created Log-------------ENDS++++++++++++++++++++++
+            //
+          } else if (respAdd.status == "error") {
+            //console.log("Error");
+            const err = respAdd.message;
+            const respError = await error_query(err);
+            console.log("Back 1-E");
+            //console.log(respError);
+            const Error = {
+              status: "error",
+              message: respError.message,
+            };
+            res.status(respError.statusCode).json(Error);
+          }
         }
-        //Get data for created Log-------------ENDS++++++++++++++++++++++
+        await createLog(filteredData);
+        //STEP_1---createLog and get data----------------ENDS
+        //------------------------------------------------------
+        //
+
         //
       } else if (respAdd.status == "error") {
         //console.log("Error");
         const err = respAdd.message;
         const respError = await error_query(err);
-        console.log("Back 1-E");
+        console.log("Back 0-E");
         //console.log(respError);
         const Error = {
           status: "error",
@@ -99,9 +184,8 @@ const CreateLog = async (req, res) => {
         res.status(respError.statusCode).json(Error);
       }
     }
-    await createLog(filteredData);
-    //STEP_1---createLog and get data----------------ENDS
-    //------------------------------------------------------
+    await createAttachment(attachment_data);
+    //STEP_0---createAttachment and return id----------------ENDS
     //
   } else {
     //console.log("Invalid Details");
@@ -118,39 +202,69 @@ const GetLog = async (req, res) => {
   const logId = req.params.id;
   // console.log(logId);
   //
-  async function getDataFunc(configID) {
+  async function getDataFunc(logID) {
     //console.log("Inside getDataFunc");
     //
     var allData = 0;
     var idData = 0;
-    var view_payload;
-    configID == "all" ? (allData = 1) : (idData = 1);
+    var sql_query_payload;
+    logID == "all" ? (allData = 1) : (idData = 1);
     //
     if (allData == 1) {
-      view_payload = {
-        table_name: table_name,
-        dataToGet:
-          "id, employee_id, attachment_name, data_time, activity_grade",
+      sql_query_payload = {
+        sql_script:
+          "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.data_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id",
+        sql_values: null,
       };
     } else if (idData == 1) {
-      view_payload = {
-        table_name: table_name,
-        dataToGet:
-          "id, employee_id, attachment_name, data_time, activity_grade",
-        query_field: "id",
-        query_value: configID,
+      sql_query_payload = {
+        sql_script:
+          "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.data_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id WHERE l.id=",
+        sql_values: logID,
       };
     }
-    // console.log(view_payload);
+    // console.log(sql_query_payload);
     //
-    const respView = await view_query(view_payload);
+    const respView = await sql_query(sql_query_payload);
     console.log("Back 1");
     //console.log(respView);
     if (respView.status == "success") {
       //console.log("Success Log Data Got");
+      //
+      //removing row data packet-------------STARTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      var resultArray = Object.values(
+        JSON.parse(JSON.stringify(respView.data))
+      );
+      //console.log(resultArray);
+      //removing row data packet-------------ENDS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/
+      //
+      //HANDLING IMAGE url concat, attributes ----------------------------------------STARTS
+      //map response array resdata and get images from each item
+      let resdatamap = resultArray.map((item) => {
+        //console.log(item.images);
+        //
+        const strdata = item.attachment_url;
+        //console.log(item);
+        //if images is not null then convert to array and then concat
+        if (strdata != null) {
+          // console.log("hello");
+          let var1 = strdata.split(","); //array made
+          //concat in array
+          let var2 = var1.map((item1) => {
+            return domainpath.concat(item1);
+          });
+          // console.log(var2);
+          //delete item.images;//didnt req as it overwrites data
+          item.attachment_url = var2; //put new data to images.item
+        }
+        return item; //return modified item
+      });
+      // console.log(resdatamap);
+      //HANDLING IMAGE url concat, attributes ---------------------------------------ENDS
+      //
       const Response = {
         message: respView.status,
-        responsedata: { log: respView.data },
+        responsedata: { log: resdatamap },
       };
       res.status(200).json(Response);
     } else if (respView.status == "error") {
@@ -213,7 +327,7 @@ const UpdateLog = async (req, res) => {
           const view_payload = {
             table_name: table_name,
             dataToGet:
-              "id, employee_id, attachment_name, data_time, activity_grade",
+              "id, employee_id, attachment_id, data_time, activity_grade",
             query_field: "id",
             query_value: logId,
           };
