@@ -17,7 +17,7 @@
           alt=""
         />
       </div>
-      <form name="RegForm" id="Login_form" onsubmit="return false">
+      <form name="RegForm" id="Login_form" onsubmit="validate()" method="post">
         <div class="form-Main">
           <label action="#" for="email" class="sr-only"><b>Username</b></label>
           <input
@@ -25,30 +25,22 @@
             placeholder="Enter Username"
             name="email"
             id="logName"
-            autofocus
+            required
           />
-
           <label for="password" class="sr-only"><b>Password</b></label>
           <input
             type="password"
             placeholder="Enter Password"
             name="password"
             id="logPassword"
-            autofocus
+            required
           />
-
-          <p id="blankField"></p>
-          <p id="EPError"></p>
-          <!-- <button type="submit" id="submit" onclick="validate(),increase()">Login</button> -->
-
+          <!-- <p id="blankField"></p>
+          <p id="EPError"></p> -->
           <label>
-            <input type="checkbox" checked="checked" name="remember" /> Remember
-            me
+            <input type="checkbox" onclick="showpass()" />Show Password
           </label>
-
-          <button type="submit" id="submit" onclick="return validate()">
-            Login
-          </button>
+          <button type="submit" id="submit">Login</button>
         </div>
       </form>
     </div>
