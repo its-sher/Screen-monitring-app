@@ -141,15 +141,25 @@ const Login = async (req, res) => {
         //Compare password ------------------------------------------------ends
       } else if (respView.status == "error") {
         //console.log("Error");
-        const err = respAdd.message;
-        const respError = await error_query(err);
-        console.log("Back 1-E");
-        //console.log(respError);
-        const Error = {
-          status: "error",
-          message: respError.message,
-        };
-        res.status(respError.statusCode).json(Error);
+        const err = respView.message;
+        console.log(err); //{ code: 'NO_DATA', sqlMessage: 'No Data' }
+
+        if (err.code == "NO_DATA") {
+          const Error = {
+            status: "error",
+            message: "Incorrect Credentials",
+          };
+          res.status(403).json(Error);
+        } else {
+          const respError = await error_query(err);
+          console.log("Back 1-E");
+          //console.log(respError);
+          const Error = {
+            status: "error",
+            message: respError.message,
+          };
+          res.status(respError.statusCode).json(Error);
+        }
       }
     }
     await getDataFunc();
