@@ -16,7 +16,7 @@ const checkemployee = (req, res, next) => {
     // console.log("NUMBER");
     //if id is integer
     con.query(
-      "SELECT id from employees WHERE id=?",
+      "SELECT id from employee WHERE id=?",
       [idvalue],
       (err, response) => {
         console.log(response);
@@ -117,7 +117,7 @@ const checkemployeealready = (req, res, next) => {
       const email = filteredData.email;
       //
       const sql = con.query(
-        "SELECT u.id from employees as u WHERE u.phone=?",
+        "SELECT u.id from employee as u WHERE u.phone=?",
         //LEFT JOIN users_role as ur ON u.id=ur.users_id
         [phone],
         (err, response) => {
@@ -136,7 +136,7 @@ const checkemployeealready = (req, res, next) => {
             else {
               //No  PHONE found so now EMAIL check
               const sql1 = con.query(
-                "SELECT u.id from employees as u WHERE u.email=?",
+                "SELECT u.id from employee as u WHERE u.email=?",
                 //LEFT JOIN users_role as ur ON u.id=ur.users_id
                 [email],
                 (err, response) => {
@@ -193,7 +193,7 @@ const checkemployeealready = (req, res, next) => {
       const phone = filteredData.phone; //9999988888
       //
       const sql = con.query(
-        "SELECT u.id from employees as u WHERE u.phone=?",
+        "SELECT u.id from employee as u WHERE u.phone=?",
         //LEFT JOIN users_role as ur ON u.id=ur.users_id
         [phone],
         (err, response) => {
@@ -240,7 +240,7 @@ const checkemployeealready = (req, res, next) => {
       const email = filteredData.email;
       //
       const sql1 = con.query(
-        "SELECT u.id from employees as u  WHERE u.email=?",
+        "SELECT u.id from employee as u  WHERE u.email=?",
         //LEFT JOIN users_role as ur ON u.id=ur.users_id
         [email],
         (err, response) => {

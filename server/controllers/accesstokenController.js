@@ -13,7 +13,7 @@ const { base64encode, base64decode } = require("nodejs-base64");
 //const { encrypttheid, decodetheid } = require("../helpers/encode-decode");
 //
 //console.log("Inside Access Token controller");
-const table_name = "employees";
+const table_name = "employee";
 //
 //-------------------------------------------------------------------------------------------------------------
 const CreateAccessRefreshToken = async (req, res) => {
@@ -178,7 +178,7 @@ const RegenerateAccessToken = async (req, res) => {
     console.log("Inside getDataFunc");
     let sql_query_payload = {
       sql_script:
-        "SELECT id FROM `employees` WHERE `refresh_token`=? AND `api_key`=?",
+        "SELECT id FROM `employee` WHERE `refresh_token`=? AND `api_key`=?",
       sql_values: [refresh_token, api_key],
     };
     //console.log(sql_query_payload);

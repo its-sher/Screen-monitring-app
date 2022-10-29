@@ -9,7 +9,7 @@ const {
   error_query,
 } = require("../helpers/instructions");
 var moment = require("moment");
-const table_name = "employees";
+const table_name = "employee";
 console.log("Inside Login controller");
 //
 const Login = async (req, res) => {

@@ -10,7 +10,7 @@ const {
   //deleteHelper,
   trash_query,
 } = require("./helpers/instructions");
-const table_name = "employees";
+const table_name = "employee";
 
 //VALIDATE ACCESS TOKEN FOR EACH URL---------------------------------------------------------
 const GenuineToken = async (req, res, next) => {

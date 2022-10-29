@@ -1,6 +1,6 @@
 const { edit_query, error_query } = require("../helpers/instructions");
 //console.log("Inside Logout controller");
-const table_name = "employees";
+const table_name = "employee";
 
 const Logout = async (req, res) => {
   console.log("Inside logout api");
