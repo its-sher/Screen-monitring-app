@@ -1,49 +1,61 @@
 const con = require("../models/db");
 
 const sql_query = (sql_query_payload) => {
-  //console.log("Inside sql_query HELPER"); -----scriptAndValues
-  /*----------------payload example--------------------------
-  let sql_query_payload = {
-    sql_script:
-      "INSERT INTO configuration (config_key, config_value) VALUES ?",
-    sql_values: arr,
-  };
-  ----------------payload example--------------------------*/
   //console.log("Inside sql_query HELPER");-----onlyScript
   /*----------------payload example--------------------------
   let sql_query_payload = {
     sql_script:
       "INSERT INTO configuration (config_key, config_value) VALUES ?",
-    sql_values: null,
   };
   ----------------payload example--------------------------*/
-  console.log(sql_query_payload);
-  var sqlquery;
-  var params;
-  var onlyScript = 0;
-  var scriptAndValues = 0;
-  if (
-    sql_query_payload.sql_script &&
-    sql_query_payload.sql_script.length > 0 &&
-    sql_query_payload.sql_values == null
-  ) {
-    console.log("Valid Details- only sql_script");
+  //console.log(sql_query_payload);
+  if (sql_query_payload.sql_script && sql_query_payload.sql_script.length > 0) {
+    console.log("Valid Details");
     //
-    sqlquery = sql_query_payload.sql_script;
+    var sqlquery = sql_query_payload.sql_script;
     //console.log(sqlquery);
-    onlyScript = 1;
-  } else if (
-    sql_query_payload.sql_script &&
-    sql_query_payload.sql_script.length > 0 &&
-    sql_query_payload.sql_values
-  ) {
-    console.log("Valid Details- both sql_script and sql_values");
     //
-    sqlquery = sql_query_payload.sql_script;
-    //console.log(sqlquery);
-    params = sql_query_payload.sql_values;
-    // console.log(params);
-    scriptAndValues = 1;
+    const promise1 = new Promise((resolve, reject) => {
+      const sql = con.query(sqlquery, (error, result) => {
+        if (error) {
+          console.log("Query Error - sql_query HELPER");
+          reject(error);
+        }
+        console.log(result);
+        if (
+          result
+          //&& result.length > 0
+        ) {
+          console.log("Query Success - sql_query HELPER");
+          const Response = {
+            status: "success",
+            data: result,
+          };
+          resolve(Response);
+        } else {
+          // console.log("Nothing Done - sql_query HELPER ");
+          reject();
+        }
+      });
+      console.log(sql.sql);
+    });
+    const response_promise = promise1
+      .then((value) => {
+        console.log("promise done - sql_query HELPER");
+        //console.log(value);
+        return value;
+      })
+      .catch((error) => {
+        console.log("Catch Error - sql_query HELPER");
+        // console.log(error);
+        const Error = {
+          status: "error",
+          message: error,
+        };
+        return Error;
+      });
+    return response_promise;
+    //
   } else {
     console.log("Invalid Details");
     const Error = {
@@ -52,52 +64,6 @@ const sql_query = (sql_query_payload) => {
     };
     return Error;
   }
-  const promise1 = new Promise((resolve, reject) => {
-    var str;
-    if (onlyScript == 1) {
-      str = sqlquery;
-    } else if (scriptAndValues == 1) {
-      str = sqlquery + params;
-    }
-    const sql = con.query(str, (error, result) => {
-      if (error) {
-        console.log("Query Error - sql_query HELPER");
-        reject(error);
-      }
-      console.log(result);
-      if (
-        result
-        //&& result.length > 0
-      ) {
-        console.log("Query Success - sql_query HELPER");
-        const Response = {
-          status: "success",
-          data: result,
-        };
-        resolve(Response);
-      } else {
-        // console.log("Nothing Done - sql_query HELPER ");
-        reject();
-      }
-    });
-    console.log(sql.sql);
-  });
-  const response_promise = promise1
-    .then((value) => {
-      console.log("promise done - sql_query HELPER");
-      //console.log(value);
-      return value;
-    })
-    .catch((error) => {
-      console.log("Catch Error - sql_query HELPER");
-      // console.log(error);
-      const Error = {
-        status: "error",
-        message: error,
-      };
-      return Error;
-    });
-  return response_promise;
 };
 //-----------------------------------------------------------------
 //

@@ -1,5 +1,6 @@
 const con = require("../models/db");
 const {
+  sql_query,
   add_query,
   view_query,
   edit_query,
@@ -113,54 +114,107 @@ const GetProject = async (req, res) => {
   //
   const projectId = req.params.id;
   // console.log(projectId);
-  //
-  async function getDataFunc(configID) {
-    //console.log("Inside getDataFunc");
+  if (projectId == "all" || projectId > 0) {
+    //console.log("Valid url params");
     //
-    var allData = 0;
-    var idData = 0;
-    var view_payload;
-    configID == "all" ? (allData = 1) : (idData = 1);
-    //
-    if (allData == 1) {
-      view_payload = {
-        table_name: table_name,
-        dataToGet: "id, client_id, title, description, attachment, active",
+    //STEP-1 get user id from accesstoken--starts--------------------------------------1
+    const access_token = req.headers.token;
+    // console.log(access_token);
+    async function getDataFunc1(access_token) {
+      //console.log("Inside getDataFunc1");
+      //
+      const view_payload = {
+        table_name: "employee",
+        dataToGet: "id",
+        query_field: "access_token",
+        query_value: access_token,
       };
-    } else if (idData == 1) {
-      view_payload = {
-        table_name: table_name,
-        dataToGet: "id, client_id, title, description, attachment, active",
-        query_field: "id",
-        query_value: configID,
-      };
+      //console.log(view_payload);
+      //
+      const respView = await view_query(view_payload);
+      console.log("Back 1");
+      console.log(respView);
+      if (respView.status == "success") {
+        //console.log("Success employee Data Got");
+        const employeeId = respView.data[0].id;
+        //console.log(employeeId);
+        //STEP-2-----NOW GET DATA FROM project table wd employee id and all/id----STARTS
+        async function getDataFunc2(configID, empID) {
+          //console.log("Inside getDataFunc2");
+          //console.log(configID);
+          //console.log(empID);
+          //
+          var allData = 0;
+          var idData = 0;
+          var sql_query_payload;
+          configID == "all" ? (allData = 1) : (idData = 1);
+          //
+          if (allData == 1) {
+            sql_query_payload = {
+              sql_script: `SELECT id, client_id, title, description, attachment_id, active FROM project WHERE assigned_to=${empID}`,
+            };
+          } else if (idData == 1) {
+            sql_query_payload = {
+              sql_script: `SELECT id, client_id, title, description, attachment_id, active FROM project WHERE assigned_to=${empID} AND id=${configID}`,
+            };
+          }
+          //console.log(sql_query_payload);
+          //
+          const respSql = await sql_query(sql_query_payload);
+          console.log("Back 2");
+          // console.log(respSql);
+          if (respSql.status == "success") {
+            //console.log("Success Project Data Got");
+            const Response = {
+              message: respSql.status,
+              responsedata: { project: respSql.data },
+            };
+            res.status(200).json(Response);
+          } else if (respSql.status == "error") {
+            //console.log("Error");
+            const err = respSql.message;
+            const respError = await error_query(err);
+            console.log("Back 2-E");
+            //console.log(respError);
+            const Error = {
+              status: "error",
+              message: respError.message,
+            };
+            res.status(respError.statusCode).json(Error);
+          }
+        }
+        await getDataFunc2(projectId, employeeId);
+        //STEP-2-----NOW GET DATA FROM project table wd employee id and all/id----ENDS
+        //
+      } else if (respView.status == "error") {
+        //console.log("Error");
+        const err = respView.message;
+        //{ code: 'NO_DATA', sqlMessage: 'No Data' }
+        if (err.code == "NO_DATA") {
+          const Error = {
+            error: "Forbidden!! UnAuthorized Access!!",
+          };
+          return res.status(403).json(Error);
+        } else {
+          const respError = await error_query(err);
+          console.log("Back 1-E");
+          //console.log(respError);
+          const Error = {
+            status: "error",
+            message: respError.message,
+          };
+          res.status(respError.statusCode).json(Error);
+        }
+      }
     }
-    // console.log(view_payload);
+    await getDataFunc1(access_token);
+    //STEP-1 get user id from accesstoken--ends--------------------------------------2
     //
-    const respView = await view_query(view_payload);
-    console.log("Back 1");
-    //console.log(respView);
-    if (respView.status == "success") {
-      //console.log("Success Project Data Got");
-      const Response = {
-        message: respView.status,
-        responsedata: { project: respView.data },
-      };
-      res.status(200).json(Response);
-    } else if (respView.status == "error") {
-      //console.log("Error");
-      const err = respView.message;
-      const respError = await error_query(err);
-      console.log("Back 1-E");
-      console.log(respError);
-      const Error = {
-        status: "error",
-        message: respError.message,
-      };
-      res.status(respError.statusCode).json(Error);
-    }
+  } else {
+    console.log("Invalid url params");
+    const Error = { status: "error", message: "Invalid Details" };
+    res.status(400).json(Error);
   }
-  await getDataFunc(projectId);
   //
 };
 //-----------------------------------------------------------------------------------------------------------
