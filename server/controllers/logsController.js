@@ -6,7 +6,7 @@ const {
   view_query,
   edit_query,
   error_query,
-  //deleteHelper,
+  delete_query,
   trash_query,
 } = require("../helpers/instructions");
 //
@@ -29,7 +29,7 @@ const CreateLog = async (req, res) => {
     dataLogTable.attachment_title.length > 0 &&
     dataLogTable.attachment_url &&
     dataLogTable.attachment_url.length > 0 &&
-    dataLogTable.data_time &&
+    dataLogTable.date_time &&
     dataLogTable.activity_grade
   ) {
     //console.log(dataLogTable);
@@ -99,7 +99,7 @@ const CreateLog = async (req, res) => {
             //Get data for created Log-------------STARTS++++++++++++++++++++++
             let sql_query_payload = {
               sql_script:
-                "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.data_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id WHERE l.id=",
+                "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.date_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id WHERE l.id=",
               sql_values: id,
             };
             const respView = await sql_query(sql_query_payload);
@@ -213,13 +213,13 @@ const GetLog = async (req, res) => {
     if (allData == 1) {
       sql_query_payload = {
         sql_script:
-          "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.data_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id",
+          "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.date_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id",
         sql_values: null,
       };
     } else if (idData == 1) {
       sql_query_payload = {
         sql_script:
-          "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.data_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id WHERE l.id=",
+          "SELECT l.id, l.employee_id, l.attachment_id, a.title as attachment_title, a.url as attachment_url, l.date_time, l.activity_grade FROM logs as l LEFT JOIN attachment as a ON l.attachment_id=a.id WHERE l.id=",
         sql_values: logID,
       };
     }
@@ -327,7 +327,7 @@ const UpdateLog = async (req, res) => {
           const view_payload = {
             table_name: table_name,
             dataToGet:
-              "id, employee_id, attachment_id, data_time, activity_grade",
+              "id, employee_id, attachment_id, date_time, activity_grade",
             query_field: "id",
             query_value: logId,
           };
@@ -387,27 +387,17 @@ const UpdateLog = async (req, res) => {
 };
 //-----------------------------------------------------------------------------------------------------------------
 //
-// DeleteLog (Trash)--------------------------------------------------
-const DeleteLog = async (req, res) => {
-  console.log("Inside DeleteLog");
+// TrashLog (Trash)--------------------------------------------------
+const TrashLog = async (req, res) => {
+  console.log("Inside TrashLog");
   const logId = req.params.id;
   // console.log(logId);
   //
   async function deleteConfigFunc(deleteID) {
-    console.log("Inside DeleteLog");
+    console.log("Inside TrashLog");
     //   console.log(deleteID);
-    //----------------------1----------------------------------------------
-    // let update_payload = {
-    //   table_name: table_name,
-    //   query_field: "id",
-    //   query_value: deleteID,
-    // };
-    //console.log(update_payload);
-    // const respDelete = await deleteHelper(update_payload);
-    //----------------------1----------------------------------------------
-    //
     //-------------------2--------------------------------------------------
-    let delete_payload = {
+    let trash_payload = {
       table_name: table_name,
       query_field: "id",
       query_value: deleteID,
@@ -416,8 +406,8 @@ const DeleteLog = async (req, res) => {
         trash: 1,
       },
     };
-    //console.log(delete_payload);
-    const respDelete = await trash_query(delete_payload);
+    //console.log(trash_payload);
+    const respDelete = await trash_query(trash_payload);
     console.log("Back 1");
     //console.log(respDelete);
     if (respDelete.status == "success") {
@@ -446,9 +436,93 @@ const DeleteLog = async (req, res) => {
 };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //
+// DeleteLog (Trash)--------------------------------------------------
+const DeleteLog = async (req, res) => {
+  console.log("Inside DeleteLog");
+  const logId = req.params.id;
+  // console.log(logId);
+  //
+  //1--get id, url from attachment from log id
+  //2--delete attachment row from table
+  //3--delete files from folder
+  //4--then delete the log row by id
+  //
+  //STEP-1---------------------------------------- get id, url from attachment from log id ---starts
+  async function getDataFunc(logID) {
+    //console.log("Inside getDataFunc");
+    //SELECT a.id, a.url FROM logs as l LEFT JOIN attachment as a ON a.id=l.attachment_id WHERE l.id=10;
+    sql_query_payload = {
+      sql_script:
+        "SELECT a.id, a.url FROM logs as l LEFT JOIN attachment as a ON a.id=l.attachment_id WHERE l.id=",
+      sql_values: logID,
+    };
+    // console.log(sql_query_payload);
+    const respView = await sql_query(sql_query_payload);
+    console.log("Back 1");
+    //console.log(respView);
+    if (respView.status == "success") {
+      //console.log("Success Log Data Got");
+      //
+      //
+    } else if (respView.status == "error") {
+      //console.log("Error");
+      const err = respView.message;
+      const respError = await error_query(err);
+      console.log("Back 1-E");
+      console.log(respError);
+      const Error = {
+        status: "error",
+        message: respError.message,
+      };
+      res.status(respError.statusCode).json(Error);
+    }
+  }
+  await getDataFunc(logId);
+  //STEP-1---------------------------------------- get id, url from attachment from log id ---ends
+
+  async function deleteConfigFunc(deleteID) {
+    console.log("Inside DeleteLog");
+    //   console.log(deleteID);
+    //----------------------1----------------------------------------------
+    let delete_payload = {
+      table_name: table_name,
+      query_field: "id",
+      query_value: deleteID,
+    };
+    //console.log(delete_payload);
+    const respDelete = await delete_query(delete_payload);
+    console.log("Back 1");
+    //console.log(respDelete);
+    if (respDelete.status == "success") {
+      //console.log("Success Log Trash Deleted");
+      const Response = {
+        status: "success",
+        message: "Log Deleted Successfully",
+      };
+      res.status(201).json(Response);
+    } else if (respDelete.status == "error") {
+      //console.log("Error");
+      const err = respDelete.message;
+      const respError = await error_query(err);
+      console.log("Back 1-E");
+      //  console.log(respError);
+      const Error = {
+        status: "error",
+        message: respError.message,
+      };
+      res.status(respError.statusCode).json(Error);
+    }
+    //----------------------1----------------------------------------------
+  }
+  await deleteConfigFunc(logId);
+  //
+};
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//
 module.exports = {
   CreateLog, //done
   GetLog, //done
   UpdateLog, //done
-  DeleteLog, //done
+  TrashLog, //done
+  DeleteLog,
 };

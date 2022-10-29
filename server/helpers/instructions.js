@@ -6,11 +6,14 @@ const sql_query = (sql_query_payload) => {
   let sql_query_payload = {
     sql_script:
       "INSERT INTO configuration (config_key, config_value) VALUES ?",
+      method:"get"//etc
   };
   ----------------payload example--------------------------*/
   //console.log(sql_query_payload);
+  const method = sql_query_payload.method;
+  //console.log(method);
   if (sql_query_payload.sql_script && sql_query_payload.sql_script.length > 0) {
-    console.log("Valid Details");
+    //console.log("Valid Details");
     //
     var sqlquery = sql_query_payload.sql_script;
     //console.log(sqlquery);
@@ -21,20 +24,34 @@ const sql_query = (sql_query_payload) => {
           console.log("Query Error - sql_query HELPER");
           reject(error);
         }
-        console.log(result);
-        if (
-          result
-          //&& result.length > 0
-        ) {
-          console.log("Query Success - sql_query HELPER");
-          const Response = {
-            status: "success",
-            data: result,
-          };
-          resolve(Response);
+        //console.log(result);
+        if (method == "get") {
+          if (result && result.length > 0) {
+            console.log("Query Success - sql_query HELPER");
+            const Response = {
+              status: "success",
+              data: result,
+            };
+            resolve(Response);
+          } else {
+            // console.log("Nothing Done - sql_query HELPER ");
+            reject();
+          }
         } else {
-          // console.log("Nothing Done - sql_query HELPER ");
-          reject();
+          if (
+            result
+            //&& result.length > 0
+          ) {
+            console.log("Query Success - sql_query HELPER");
+            const Response = {
+              status: "success",
+              data: result,
+            };
+            resolve(Response);
+          } else {
+            // console.log("Nothing Done - sql_query HELPER ");
+            reject();
+          }
         }
       });
       console.log(sql.sql);

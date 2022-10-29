@@ -10,6 +10,7 @@ const {
 } = require("../helpers/instructions");
 //
 //console.log("Inside Project Controller");
+const domainpath = process.env.REACT_APP_DOMAIN_ENDPOINT;
 const table_name = "project";
 //
 //-------------------------------------------------------------------------------------------------------------
@@ -151,11 +152,13 @@ const GetProject = async (req, res) => {
           //
           if (allData == 1) {
             sql_query_payload = {
-              sql_script: `SELECT id, client_id, title, description, attachment_id, active FROM project WHERE assigned_to=${empID}`,
+              sql_script: `SELECT p.id, p.client_id, p.title, p.description, p.attachment_id, a.title as attachment_title, a.url as attachment_url, p.active FROM project as p LEFT JOIN attachment as a ON p.attachment_id=a.id WHERE p.assigned_to=${empID}`,
+              method: "get",
             };
           } else if (idData == 1) {
             sql_query_payload = {
-              sql_script: `SELECT id, client_id, title, description, attachment_id, active FROM project WHERE assigned_to=${empID} AND id=${configID}`,
+              sql_script: `SELECT p.id, p.client_id, p.title, p.description, p.attachment_id, a.title as attachment_title, a.url as attachment_url, p.active FROM project as p LEFT JOIN attachment as a ON p.attachment_id=a.id WHERE p.assigned_to=${empID} AND p.id=${configID}`,
+              method: "get",
             };
           }
           //console.log(sql_query_payload);
@@ -165,9 +168,41 @@ const GetProject = async (req, res) => {
           // console.log(respSql);
           if (respSql.status == "success") {
             //console.log("Success Project Data Got");
+            //
+            //removing row data packet-------------STARTS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            var resultArray = Object.values(
+              JSON.parse(JSON.stringify(respSql.data))
+            );
+            //console.log(resultArray);
+            //removing row data packet-------------ENDS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~/
+            //
+            //HANDLING IMAGE url concat, attributes ----------------------------------------STARTS
+            //map response array resdata and get images from each item
+            let resdatamap = resultArray.map((item) => {
+              //console.log(item.images);
+              //
+              const strdata = item.attachment_url;
+              //console.log(item);
+              //if images is not null then convert to array and then concat
+              if (strdata != null) {
+                // console.log("hello");
+                let var1 = strdata.split(","); //array made
+                //concat in array
+                let var2 = var1.map((item1) => {
+                  return domainpath.concat(item1);
+                });
+                // console.log(var2);
+                //delete item.images;//didnt req as it overwrites data
+                item.attachment_url = var2; //put new data to images.item
+              }
+              return item; //return modified item
+            });
+            // console.log(resdatamap);
+            //HANDLING IMAGE url concat, attributes ---------------------------------------ENDS
+            //
             const Response = {
               message: respSql.status,
-              responsedata: { project: respSql.data },
+              responsedata: { project: resdatamap },
             };
             res.status(200).json(Response);
           } else if (respSql.status == "error") {
