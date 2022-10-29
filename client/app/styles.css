@@ -122,28 +122,6 @@ span.add_task {
   font-weight: 600;
 }
 
-.green {
-  color: #3aa03b;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.red {
-  color: #ff0000;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.greentext {
-  color: #3aa03b;
-  font-size: 14px;
-}
-
-.redtext {
-  color: #ff0000;
-  font-size: 14px;
-}
-
 .tasktext1 {
   padding: 8px 5px 8px 10px;
   text-align: center;
@@ -261,13 +239,31 @@ span.add_task {
   font-weight: 600;
   color: #000248;
 }
+select#selectproject {
+  width: 60%;
+  font-size: 14px;
+  padding: 4px 8px;
+}
 
-#input {
-  width: 50%;
+#select {
+  width: 45%;
   padding: 4px 8px;
   font-size: 14px;
 }
-
+button#savetask {
+  color: green;
+  font-size: 14px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+}
+button#canceltask {
+  color: red;
+  font-size: 14px;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+}
 .section2 .row.dashboard-text1 {
   display: flex;
 }
@@ -430,7 +426,7 @@ input.recent_task {
 #start-btn,
 #start-resume,
 #stop-btn {
-  width: 90%;
+  width: 100%;
   margin: 12px 0 12px 0;
   background: #000248;
   border-radius: 0px;
@@ -481,8 +477,8 @@ div#second-timer {
 
 .AddTaskInput input {
   width: 40%;
-  padding: 6px 10px;
-  font-size: 17px;
+  padding: 4px 8px;
+  font-size: 14px;
 }
 
 span.plus_icon {
@@ -606,7 +602,11 @@ button#submit {
   font-size: 20px;
   border: none;
 }
-
+label#autoProject {
+  font-size: 20px;
+  font-weight: 600;
+  color: green;
+}
 @media screen and (max-width: 300px) {
   .loginform span.psw {
     display: block;

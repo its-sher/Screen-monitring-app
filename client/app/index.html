@@ -22,24 +22,28 @@
 		</div>
 	</div>
 	<div class="row dashboard-text flex">
-		<div class="Project_name"><h4>EZMOOV</h4></div>
+		<select id="selectproject"class="option" onclick="Projectlist()">
+			<option value="">Select Project</option>
+		  </select>
 	</div>
 	<div class="row dashboard-text">
-		<div class="return-task">
-		<select name="" id="input">
-		  <option value="ez">Ezmoov</option>
-		  <option value="hg">HagglerPlanet</option>
-		  <option value="ho">Health4Objective</option>
+			<form name="formid"class="return-task">
+		<select name="ddlselect" id="select">
+		  <option disable hidden selected>Select Task</option>
+		  <option value="HagglerPlanet">Ezmoov</option>
+		  <option value="HagglerPlanet">HagglerPlanet</option>
+		  <option value="Health4Objective">Health4Objective</option>
 		</select>
 		<span class="plus_icon" onclick="plus_icon()">
 			<i class="fa fa-plus-circle" aria-hidden="true"></i><span class="add_task">Task</span>
 		  </span>
-	    </div>
+		</form>
+	    
 		<div class="AddTaskInput" style="display: none;" onclick="AddTaskInput()">
 		<div class="InnerAddTaskInput">
-			<input type="text" placeholder="Add Task">
-			<a class="AddTaskSave" style="display: none;">Save</a>
-			<a class="AddTaskCancel" onclick="AddTaskCancel()">Cancel</a>
+			<input type="text" placeholder="Add Task" id="val">
+			<button class="AddTaskSave"id="savetask" onclick="insertValue();">Save</button>
+			<button class="AddTaskCancel"id="canceltask" onclick="AddTaskCancel()">Cancel</button>
 		</div>
 		</div>
 		

@@ -7,7 +7,7 @@ const { checkLog } = require("../models/logs");
 router.post("/", userController.CreateLog);
 router.get("/:id", userController.GetLog);
 router.put("/:id", userController.UpdateLog);
-router.delete("/trash/:id", checkLog, userController.TrashLog);
-router.delete("/:id", checkLog, userController.DeleteLog);
+// router.delete("/trash/:id", checkLog, userController.TrashLog);
+// router.delete("/:id", checkLog, userController.DeleteLog);
 //
 module.exports = router;

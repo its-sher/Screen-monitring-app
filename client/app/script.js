@@ -1,5 +1,4 @@
 // var attempt = 3; // Variable to count number of attempts.
-// Below function Executes on click of login button.
 function validate() {
   var email = document.getElementById("logName").value;
   var password = document.getElementById("logPassword").value;
@@ -34,6 +33,29 @@ function validate() {
 }
 //----------------------------------------End-------------------------------------//
 
+//=======================================project-list===============================//
+
+function Projectlist() {
+  var myHeaders = new Headers();
+  myHeaders.append(
+    "token",
+    "ZjIzYzU4NjQtNmY0MS00NTExLWE5ZTctMDRjMmJlZTczM2MwMmRkZDk5ZmE0NGU1NjhiNGI4MmVmM2MzZjNiZTJmMjI="
+  );
+
+  var requestOptions = {
+    method: "GET",
+    headers: myHeaders,
+    redirect: "follow",
+  };
+
+  fetch("http://localhost:8000/project/1", requestOptions)
+    .then((response) => response.text())
+    .then((result) => console.log(result))
+    .catch((error) => console.log("error", error));
+}
+
+//============================================end===================================//
+
 //---------for refresh-------------//
 function refreshPage() {
   window.location.reload();
@@ -58,13 +80,13 @@ function Timer() {
 //--------for add task field --------//
 function plus_icon() {
   document.querySelector(".AddTaskInput").style.display = "block";
-  document.querySelector("#input").style.display = "none";
+  document.querySelector("#select").style.display = "none";
   document.querySelector(".plus_icon").style.display = "none";
 }
 
 function AddTaskCancel() {
   document.querySelector(".AddTaskInput").style.display = "none";
-  document.querySelector("#input").style.display = "block";
+  document.querySelector("#select").style.display = "block";
   document.querySelector(".plus_icon").style.display = "block";
 }
 
@@ -73,12 +95,17 @@ function AddTaskInput() {
 }
 
 function hello() {
+  sessionStorage.clear();
   window.location.href = "login.html"; // Redirecting to other page.
   return false;
 }
 
-// Task input get value
-// function getTaskVal() {
-//   var inputVal = document.getElementById("addTask").value;
-//   alert(inputVal);
-// }
+//Add value to dropdown
+function insertValue() {
+  var select = document.getElementById("select"),
+    txtval = document.getElementById("val").value,
+    newOption = document.createElement("OPTION"),
+    newOptionVal = document.createTextNode(txtval);
+  newOption.appendChild(newOptionVal);
+  select.insertBefore(newOption, select.lastChild);
+}
