@@ -35,7 +35,7 @@ const sql_query = (sql_query_payload) => {
             resolve(Response);
           } else {
             // console.log("Nothing Done - sql_query HELPER ");
-            reject();
+            reject("NO_DATA");
           }
         } else {
           if (
@@ -64,7 +64,7 @@ const sql_query = (sql_query_payload) => {
       })
       .catch((error) => {
         console.log("Catch Error - sql_query HELPER");
-        // console.log(error);
+        console.log(error);
         const Error = {
           status: "error",
           message: error,

@@ -227,7 +227,8 @@ const GetProject = async (req, res) => {
         //{ code: 'NO_DATA', sqlMessage: 'No Data' }
         if (err.code == "NO_DATA") {
           const Error = {
-            error: "Forbidden!! UnAuthorized Access!!",
+            status: "error",
+            message: "Forbidden!! UnAuthorized Access!!",
           };
           return res.status(403).json(Error);
         } else {
