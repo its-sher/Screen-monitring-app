@@ -1,5 +1,5 @@
-// var attempt = 3; // Variable to count number of attempts.
-function validate() {
+//=================sdfgsdgdsfgd=====================//
+function login() {
   var email = document.getElementById("logName").value;
   var password = document.getElementById("logPassword").value;
   var myHeaders = new Headers();
@@ -37,10 +37,7 @@ function validate() {
 
 function Projectlist() {
   var myHeaders = new Headers();
-  myHeaders.append(
-    "token",
-    "ZjIzYzU4NjQtNmY0MS00NTExLWE5ZTctMDRjMmJlZTczM2MwMmRkZDk5ZmE0NGU1NjhiNGI4MmVmM2MzZjNiZTJmMjI="
-  );
+  myHeaders.append("token","ODczMTM5OGQtZGNlNi00ZmI1LTk0NmYtOWQ3OTY1ZTY2NDY4MmRkZDk5ZmE0NGU1NjhiNGI4MmVmM2MzZjNiZTJmMjI=");
 
   var requestOptions = {
     method: "GET",
@@ -49,12 +46,28 @@ function Projectlist() {
   };
 
   fetch("http://localhost:8000/project/1", requestOptions)
-    .then((response) => response.text())
+    .then((response) =>{ response.text();
+    var option_html = '';
+  //--------------forLoop start---------------//
+  
+  //--------------forLoop start---------------//
+
+    option_html +"<option value'"+ +"'>";
+  document.getElementById("selectproject").innerHTML
+  
+    })
     .then((result) => console.log(result))
     .catch((error) => console.log("error", error));
 }
+//============================================end===================================//
+
+//=======================================Task-list===============================//
+
+
+
 
 //============================================end===================================//
+
 
 //---------for refresh-------------//
 function refreshPage() {
@@ -94,7 +107,7 @@ function AddTaskInput() {
   document.querySelector(".AddTaskSave").style.display = "block";
 }
 
-function hello() {
+function logout() {
   sessionStorage.clear();
   window.location.href = "login.html"; // Redirecting to other page.
   return false;
@@ -108,4 +121,13 @@ function insertValue() {
     newOptionVal = document.createTextNode(txtval);
   newOption.appendChild(newOptionVal);
   select.insertBefore(newOption, select.lastChild);
+}
+
+function getddl() {
+  document.getElementById("project").innerHTML =
+    "<b>" + formid.ddlselect[formid.ddlselect.selectedIndex].text + "</b>";
+}
+function task() {
+  document.getElementById("task").innerHTML =
+    "<b>" + formid1.ddlselect1[formid1.ddlselect1.selectedIndex].text + "</b>";
 }

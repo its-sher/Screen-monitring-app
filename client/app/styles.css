@@ -110,6 +110,14 @@ span.add_task {
 .section2 .row.dashboard-text1 {
   display: flex;
 }
+.row.dashboard-text.flex {
+  border-top: 0px solid #cdcccc;
+  border-bottom: none;
+  padding: 10px 0 0 0;
+}
+.row.dashboard-text {
+  padding: 5px 0 10px 0px;
+}
 
 #btn {
   border: none;

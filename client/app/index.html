@@ -18,25 +18,29 @@
 	<div class="report">
 	
 		<button type="submit" id="removeButton"class="btn1"><i class="fa fa-file" style="font-size: 11px;"></i> My Report</button>
-		<button type="submit" id="removeButton"class="Logout_btn" onclick="hello()"><i class="fa fa-sign-out"></i> Logout</button>
+		<button type="submit" id="removeButton"class="Logout_btn" onclick="logout()"><i class="fa fa-sign-out"></i> Logout</button>
 		</div>
 	</div>
-	<div class="row dashboard-text flex">
-		<select id="selectproject"class="option" onclick="Projectlist()">
-			<option value="">Select Project</option>
-		  </select>
+	
 	</div>
+	<div class="row dashboard-text flex">
+		<form name="formid" >
+		<select name="ddlselect" id="selectproject"class="option"onchange="getddl()" onclick="Projectlist()">
+			<option value="">---Select Project---</option>
+			</select>
+		</form>
+		<label id="project"></label>
+		  </div>
 	<div class="row dashboard-text">
-			<form name="formid"class="return-task">
-		<select name="ddlselect" id="select">
-		  <option disable hidden selected>Select Task</option>
-		  <option value="HagglerPlanet">Ezmoov</option>
-		  <option value="HagglerPlanet">HagglerPlanet</option>
-		  <option value="Health4Objective">Health4Objective</option>
+		<label id="task"></label>
+			<form name="formid1">
+		<select name="ddlselect1" id="select" onchange="task()">
+		  <option value="">---Select Task---</option>
 		</select>
 		<span class="plus_icon" onclick="plus_icon()">
 			<i class="fa fa-plus-circle" aria-hidden="true"></i><span class="add_task">Task</span>
-		  </span>
+		  </span><br>
+		  
 		</form>
 	    
 		<div class="AddTaskInput" style="display: none;" onclick="AddTaskInput()">
