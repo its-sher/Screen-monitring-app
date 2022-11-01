@@ -1,4 +1,4 @@
-//=================sdfgsdgdsfgd=====================//
+//=======================================Login Api===============================//
 function login() {
   var email = document.getElementById("logName").value;
   var password = document.getElementById("logPassword").value;
@@ -33,7 +33,7 @@ function login() {
 }
 //----------------------------------------End-------------------------------------//
 
-//=======================================project-list===============================//
+//=======================================project-list-Api===============================//
 
 function Projectlist() {
   var myHeaders = new Headers();
@@ -44,16 +44,15 @@ function Projectlist() {
     headers: myHeaders,
     redirect: "follow",
   };
-
   fetch("http://localhost:8000/project/1", requestOptions)
     .then((response) =>{ response.text();
     var option_html = '';
   //--------------forLoop start---------------//
   
-  //--------------forLoop start---------------//
+  //--------------forLoop end---------------//
 
-    option_html +"<option value'"+ +"'>";
-  document.getElementById("selectproject").innerHTML
+  option_html +"<option value'"+ +"'>";
+  document.getElementById("selectproject").innerHTML;
   
     })
     .then((result) => console.log(result))
@@ -61,11 +60,22 @@ function Projectlist() {
 }
 //============================================end===================================//
 
-//=======================================Task-list===============================//
-
-
-
-
+//=======================================Task-list-Api===============================//
+function tasklist() {
+  var myHeaders = new Headers();
+  myHeaders.append("token", "NjQ3Mzc0ZmYtMDM5Yy00NGUyLWI2MTktMDI1NjFmMjcyZmY2MmRkZDk5ZmE0NGU1NjhiNGI4MmVmM2MzZjNiZTJmMjI=");
+  
+  var requestOptions = {
+    method: 'GET',
+    headers: myHeaders,
+    redirect: 'follow'
+  };
+  
+  fetch("http://localhost:8000/task/all", requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+}
 //============================================end===================================//
 
 
@@ -93,13 +103,13 @@ function Timer() {
 //--------for add task field --------//
 function plus_icon() {
   document.querySelector(".AddTaskInput").style.display = "block";
-  document.querySelector("#select").style.display = "none";
+  document.querySelector("#selecttask").style.display = "none";
   document.querySelector(".plus_icon").style.display = "none";
 }
 
 function AddTaskCancel() {
   document.querySelector(".AddTaskInput").style.display = "none";
-  document.querySelector("#select").style.display = "block";
+  document.querySelector("#selecttask").style.display = "block";
   document.querySelector(".plus_icon").style.display = "block";
 }
 
@@ -115,7 +125,7 @@ function logout() {
 
 //Add value to dropdown
 function insertValue() {
-  var select = document.getElementById("select"),
+  var select = document.getElementById("selecttask"),
     txtval = document.getElementById("val").value,
     newOption = document.createElement("OPTION"),
     newOptionVal = document.createTextNode(txtval);

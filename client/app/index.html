@@ -21,8 +21,8 @@
 		<button type="submit" id="removeButton"class="Logout_btn" onclick="logout()"><i class="fa fa-sign-out"></i> Logout</button>
 		</div>
 	</div>
-	
 	</div>
+
 	<div class="row dashboard-text flex">
 		<form name="formid" >
 		<select name="ddlselect" id="selectproject"class="option"onchange="getddl()" onclick="Projectlist()">
@@ -30,29 +30,28 @@
 			</select>
 		</form>
 		<label id="project"></label>
-		  </div>
+	</div>
+
 	<div class="row dashboard-text">
 		<label id="task"></label>
 			<form name="formid1">
-		<select name="ddlselect1" id="select" onchange="task()">
+		<select name="ddlselect1" id="selecttask" onchange="task()" onclick="tasklist()">
 		  <option value="">---Select Task---</option>
 		</select>
+		  </form>
 		<span class="plus_icon" onclick="plus_icon()">
 			<i class="fa fa-plus-circle" aria-hidden="true"></i><span class="add_task">Task</span>
-		  </span><br>
-		  
-		</form>
-	    
-		<div class="AddTaskInput" style="display: none;" onclick="AddTaskInput()">
-		<div class="InnerAddTaskInput">
+		    </span><br>
+		    <div class="AddTaskInput" style="display: none;" onclick="AddTaskInput()">
+		    <div class="InnerAddTaskInput">
 			<input type="text" placeholder="Add Task" id="val">
 			<button class="AddTaskSave"id="savetask" onclick="insertValue();">Save</button>
 			<button class="AddTaskCancel"id="canceltask" onclick="AddTaskCancel()">Cancel</button>
-		</div>
-		</div>
-		
+		    </div>
+		    </div>
 	</div>
-	</div>
+
+
 	<div class="row dashboard-text1">
 		<button type="button" onclick="Timer()"id="btn">Start Timer</button>
 		<table style="width:100%;padding: 5px 0 5px 0;">
@@ -79,6 +78,7 @@
 		  </tr>
 		</table>
 	</div>
+	
 	<div class="row dashboard-text1"> 
 	<input type="checkbox" id="scales" name="scales" checked>
      Open the window automatically startup</div>
