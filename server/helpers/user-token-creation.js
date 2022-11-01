@@ -29,19 +29,17 @@ const accesstokencreation = (req, res) => {
 };
 //-----------------------------------------------------------------
 const refreshtokencreation = (req, res) => {
-  // console.log(req[0].id);
-  const result = req[0];
-  // console.log(result);
-  const userid = result; //194
+  const userid = req; //194
+  //console.log(userid);
   const multiply = userid * 723593727; //----------------------------------later
   const date = Date.now();
   //console.log(date);
-  const data = date + userid + multiply; //194123456789//--------------later
-  // console.log(data); //concat 194123456789
+  const data = date * date + userid + multiply; //194123456789//--------------later
+  //console.log(data); //concat 194123456789
   const encryptdata = (data * 92876962487 * 17593678) / 79596753;
-  // console.log(encryptdata);
+  //console.log(encryptdata);
   let encoded = base64encode(encryptdata);
-  //console.log(encoded);//MjQ5MTAxMjAuNzE3MDU3MDUz
+  //console.log(encoded); //MjQ5MTAxMjAuNzE3MDU3MDUz
   let md5encryption = md5(encoded);
   //console.log(md5encryption);
   return md5encryption;
