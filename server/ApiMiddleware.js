@@ -15,9 +15,11 @@ const table_name = "employee";
 //VALIDATE ACCESS TOKEN FOR EACH URL---------------------------------------------------------Starts
 const GenuineToken = async (req, res, next) => {
   //console.log("Inside GenuineToken middleware");
-  console.log(req.headers);
-  const access_token = req.headers.token;
-  console.log(access_token);
+  //console.log(req.headers);
+  const basic_auth = req.headers.token;
+  //console.log(basic_auth); //Bearer YzAxMjM0YjEtMTBiMS00NWY4LWFjZGMtYTQ2M2Q2ZTYyMzFjMmRkZDk5ZmE0NGU1NjhiNGI4MmVmM2MzZjNiZTJmMjI=
+  const access_token = await ExtractToken(basic_auth);
+  //console.log(access_token);
   //STEP-1 -------------------------------CHECK ACCESS TOKEN THERE OR NOT-------------------starts
   if (!access_token) {
     console.log("No Access Token");

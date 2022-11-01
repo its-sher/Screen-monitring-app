@@ -74,7 +74,7 @@ const CreateAccessRefreshToken = async (req, res) => {
             if (response == true) {
               console.log("loginsuccess");
               const userId = userDataDb[0].id;
-              console.log(userId);
+              //console.log(userId);
               //const encodedid = encrypttheid(userId);
               //
               //creating access token and refresh token ------------STARTS
