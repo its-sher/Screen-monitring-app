@@ -1,12 +1,16 @@
 const { edit_query, error_query } = require("../helpers/instructions");
+const { ExtractToken } = require("../ApiMiddleware");
+
 //console.log("Inside Logout controller");
 const table_name = "employee";
 
 const Logout = async (req, res) => {
   console.log("Inside logout api");
-  // console.log(req.headers);
-  const access_token = req.headers.token;
-  // console.log(access_token);
+  //console.log(req.headers);
+  const basic_auth = req.headers.token;
+  //console.log(basic_auth); //Bearer YzAxMjM0YjEtMTBiMS00NWY4LWFjZGMtYTQ2M2Q2ZTYyMzFjMmRkZDk5ZmE0NGU1NjhiNGI4MmVmM2MzZjNiZTJmMjI=
+  const access_token = await ExtractToken(basic_auth);
+  //console.log(access_token);
   //
   //STEP-1 UPDATE DB and make ACESSTOKEN, expiry null--------starts
   let update_payload = {

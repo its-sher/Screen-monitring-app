@@ -39,19 +39,20 @@ app.get("/", (req, res) => {
 });
 //
 //--------------ROUTES-----------------------------------------------------------------------------------------
+//Employee-----------------------------------------------------
 const userRouter = require("./routes/Employee");
 app.use("/employee", GenuineToken, userRouter);
 
 const accesstokenRouter = require("./routes/AccessToken");
-app.use("/accesstoken", GenuineToken, accesstokenRouter);
+app.use("/accesstoken", accesstokenRouter);
 
 const loginRouter = require("./routes/Login");
 app.use("/login", loginRouter);
 
 const logoutRouter = require("./routes/Logout");
-app.use("/logout", GenuineToken, logoutRouter);
-//-------------------------------------------------------------
-
+app.use("/logout", logoutRouter);
+//Employee-----------------------------------------------------
+//
 const clientRouter = require("./routes/Client");
 app.use("/client", GenuineToken, clientRouter);
 
@@ -70,5 +71,6 @@ app.use("/logs", logsRouter);
 
 const attachmentsRouter = require("./routes/Attachments");
 app.use("/attachments", attachmentsRouter);
+//--------------ROUTES-----------------------------------------------------------------------------------------
 
 app.listen(port, () => console.log(`Listen on port ${port}`));
