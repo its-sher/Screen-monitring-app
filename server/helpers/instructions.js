@@ -524,7 +524,7 @@ const error_query = async (error) => {
     if (error.code == "RECORD_DOESNOT_EXISTS") {
       messageERR = error.sqlMessage;
       code = 400;
-    } else if (error.code == "NO_DATA") {
+    } else if (error == "NO_DATA" || error.code == "NO_DATA") {
       messageERR = error.sqlMessage;
       code = 204;
     } else if (error.code == "INVALID_SQL_PARAMS") {

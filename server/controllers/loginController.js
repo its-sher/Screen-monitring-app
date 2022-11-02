@@ -71,7 +71,7 @@ const Login = async (req, res) => {
           console.log("Back 1-E");
           //console.log("Error");
           const err = respView.message;
-          //console.log(err); //{ code: 'NO_DATA', sqlMessage: 'No Data' }
+          console.log(err); //{ code: 'NO_DATA', sqlMessage: 'No Data' }
           if (err == "NO_DATA") {
             //no role//no permissions
             console.log("No Roles No Permissions");

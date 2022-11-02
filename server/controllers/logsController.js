@@ -140,7 +140,7 @@ const CreateLog = async (req, res) => {
               res.status(201).json(Response);
             } else if (respView.status == "error") {
               //console.log("Error");
-              const err = respAdd.message;
+              const err = respView.message;
               const respError = await error_query(err);
               console.log("Back 2-E");
               //console.log(respError);

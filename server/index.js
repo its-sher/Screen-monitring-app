@@ -51,6 +51,15 @@ app.use("/login", loginRouter);
 
 const logoutRouter = require("./routes/Logout");
 app.use("/logout", logoutRouter);
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+const roleRouter = require("./routes/Role");
+app.use("/role", roleRouter);
+
+const moduleRouter = require("./routes/Module");
+app.use("/module", moduleRouter);
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 //Employee-----------------------------------------------------
 //
 const clientRouter = require("./routes/Client");
