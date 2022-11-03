@@ -1,267 +1,176 @@
-const { decodetheid } = require("../helpers/encode-decode");
-const con = require("../models/db");
+const Role = require("../models/role");
 //
-// Get all roles from database table --role-DONE--------------------------------------------------------------
-const GetAllRoles = (req, res) => {
-  console.log("Inside GetAllRoles");
-  const sql = con.query(
-    "SELECT r.id, r.title, r.parent_role, r1.title as parent_role_name, r.store_type, st.name as store_type_name, r.store_id, r.description, r.active, r.trash, r.created_At, r.updated_at FROM role as r LEFT JOIN role as r1 ON r1.id=r.parent_role LEFT JOIN store_type as st ON st.id=r.store_type",
-    (err, response) => {
-      if (!err) {
-        if (response && response.length > 0) {
-          //array is defined and is not empty
-          //console.log(response);
-          //
-          //removing row data packet-------------STARTS
-          var resultArray = Object.values(JSON.parse(JSON.stringify(response)));
-          //  console.log(resultArray);
-          //removing row data packet-------------ENDS
-          //
-          const Response = {
-            status: "success",
-            responsedata: { roles: resultArray },
-          };
-          res.status(200).json(Response);
-        } else {
-          console.log("No Roles");
-          const Response = {
-            status: "error",
-            message: "no data in database",
-          };
-          res.status(204).json(Response);
-        }
-      } else {
-        console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-        console.log("Get Roles sql error");
-        console.log(err);
-        const Error = { status: "error", message: "Server Error" };
-        res.status(400).json(Error);
-      }
+/*-----------Roles------------------------------starts here--------------------*/
+exports.Roles = async (req, res) => {
+  var roleId;
+  let role_data = [];
+  var g_response = {};
+  var g_status_code;
+  if (req.params.id && req.params.id > 0) {
+    roleId = req.params.id;
+    try {
+      role_data = await fetch_single_role(roleId);
+      //console.log(role_data);
+      g_response["status"] = "success";
+      g_response["responsedata"] = { role: role_data };
+      g_status_code = 200;
+    } catch (err) {
+      //console.log("catch entities : ", err);
+      g_response["status"] = "error";
+      g_response["message"] = err.message;
+      g_status_code = err.statusCode;
     }
-  );
-  console.log(sql.sql);
-};
-//-------------------------------------------------------------------------------------------------------------
-//Get a single role by id --DONE-------------------------------------------------------------------------------
-const GetRoleById = async (req, res) => {
-  console.log("Inside GetRoleById");
-  const encryptedRoleId = req.params.id;
-  //console.log(encryptedRoleId);
-  const roleId = decodetheid(encryptedRoleId);
-  // console.log(roleId);
-  //
-  if (roleId && roleId > 0) {
-    console.log("Valid Role ID");
-    //
-    var role_data = {};
-    var role_data_resp = {};
-    //
-    var role_permission_data = {};
-    var role_permission_data_resp = {};
-    //
-    console.log("STEP-1 STARTS");
-    //STEP_1---createRole and get data----------------STARTS
-    //------------------------------------------------------
-    async function getRole(roleID) {
-      console.log("Inside getRole");
-      return new Promise((resolve, reject) => {
-        //   console.log(roleID);
-        //
-        const sql = con.query(
-          "SELECT r.id, r.title, r.parent_role, r1.title as parent_role_name, r.store_type, st.name as store_type_name, r.store_id, s.name as store_name, r.description, r.active FROM role as r LEFT JOIN role as r1 ON r1.id=r.parent_role LEFT JOIN store_type as st ON st.id=r.store_type LEFT JOIN stores as s ON s.id=r.store_id WHERE r.id=?", //, r.trash, r.created_At, r.updated_at
-          [roleID],
-          (err, response) => {
-            if (!err) {
-              if (response && response.length > 0) {
-                //array is defined and is not empty
-                //console.log(response);
-                //
-                //removing row data packet-------------STARTS
-                var resultArray = Object.values(
-                  JSON.parse(JSON.stringify(response))
-                );
-                //  console.log(resultArray);
-                //removing row data packet-------------ENDS
-                //
-                role_data = resultArray;
-                //data into global variable
-                //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-                resolve({
-                  result: 1,
-                });
-              } else {
-                console.log("STEP_1 ERROR");
-                console.log("SQL ERROR - No data Got - Sql Query - Role");
-                // const Error = {
-                //   status: "error",
-                //   message: "No Data",
-                // };
-                // res.status(204).json(Response);
-                reject({
-                  result: 0,
-                });
-              }
-            } else {
-              console.log("STEP_1 ERROR");
-              console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-              console.log("Get Role sql error");
-              console.log(err);
-              // const Error = {
-              //   status: "error",
-              //   message: "Server Error",
-              // };
-              // res.status(400).json(Error);
-              reject({
-                result: 0,
-              });
-            }
-          }
-        );
-        console.log(sql.sql);
-      }).catch((error) => console.log(error.message));
+    res.status(g_status_code).json(g_response);
+  } else if (req.params && Object.keys(req.params).length == 0) {
+    try {
+      role_data = await fetch_roles(roleId);
+      //console.log(role_data);
+      g_response["status"] = "success";
+      g_response["responsedata"] = { roles: role_data };
+      g_status_code = 200;
+    } catch (err) {
+      //console.log("catch entities : ", err);
+      g_response["status"] = "error";
+      g_response["message"] = err.message;
+      g_status_code = err.statusCode;
     }
-    role_data_resp = await getRole(roleId);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    console.log(role_data_resp);
-    console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-    //STEP_1---createRole and get data----------------ENDS
-    //------------------------------------------------------
-    //
-    if (
-      role_data_resp &&
-      role_data_resp !== undefined &&
-      Object.keys(role_data_resp).length != 0 &&
-      role_data_resp.result > 0
-    ) {
-      console.log("STEP-1 DONE SUCCESSFULLY");
-      console.log("STEP-2 STARTS");
-      //
-      //STEP_2---getRolePermissions data----------------STARTS
-      //------------------------------------------------------
-      async function getRolePermissions(roleID) {
-        console.log("Inside getRolePermissions");
-        return new Promise((resolve, reject) => {
-          //   console.log(roleID);
-          //
-          const sql = con.query(
-            // `SELECT concat('"', UPPER(r.title), '":{"MODULES":{', GROUP_CONCAT(concat('"',m.name,'":"',urp.access,'"') SEPARATOR ','),'}}') as data FROM role_permission as urp LEFT JOIN modules as m ON m.id=urp.module_id LEFT JOIN role as r ON r.id=urp.role_id WHERE urp.role_id=? GROUP BY r.title`,
-            `SELECT concat('"MODULES":{', GROUP_CONCAT(concat('"',m.name,'":"',urp.access,'"') SEPARATOR ','),'}') as data FROM role_permission as urp LEFT JOIN modules as m ON m.id=urp.module_id LEFT JOIN role as r ON r.id=urp.role_id WHERE urp.role_id=? GROUP BY r.title`,
-            [roleID],
-            (err, response) => {
-              if (!err) {
-                if (response && response.length > 0) {
-                  //array is defined and is not empty
-                  console.log(response);
-                  //
-                  //removing row data packet-------------STARTS
-                  var resultArray = Object.values(
-                    JSON.parse(JSON.stringify(response))
-                  );
-                  console.log(resultArray);
-                  //removing row data packet-------------ENDS
-                  //
-                  //now add curly braces and make json string---starts
-                  const jsonStringData = "{" + resultArray[0].data + "}";
-                  //console.log(jsonStringData);
-                  //now add curly braces and make json string---ends
-                  //
-                  //nw parse the data-----------------STARTS
-                  const jsonParsedData = JSON.parse(jsonStringData);
-                  //  console.log(jsonParsedData);
-                  //nw parse the data-----------------ENDS
-                  //
-                  role_permission_data = jsonParsedData;
-                  //data into global variable
-                  //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-                  resolve({
-                    result: 1,
-                  });
-                } else {
-                  console.log("STEP_2 ERROR");
-                  console.log("SQL ERROR - No data Got - Sql Query - Role");
-                  // const Error = {
-                  //   status: "error",
-                  //   message: "No Data",
-                  // };
-                  // res.status(204).json(Response);
-                  reject({
-                    result: 0,
-                  });
-                }
-              } else {
-                console.log("STEP_2 ERROR");
-                console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                console.log("Get Role sql error");
-                console.log(err);
-                // const Error = {
-                //   status: "error",
-                //   message: "Server Error",
-                // };
-                // res.status(400).json(Error);
-                reject({
-                  result: 0,
-                });
-              }
-            }
-          );
-          console.log(sql.sql);
-        }).catch((error) => console.log(error.message));
-      }
-      role_permission_data_resp = await getRolePermissions(roleId);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      console.log(role_permission_data_resp);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      //STEP_2---getRolePermissions data----------------ENDS
-      //------------------------------------------------------
-      //
-      if (
-        role_permission_data_resp &&
-        role_permission_data_resp !== undefined &&
-        Object.keys(role_permission_data_resp).length != 0 &&
-        role_permission_data_resp.result > 0
-      ) {
-        console.log("STEP-2 DONE SUCCESSFULLY");
-        console.log("Everything Done Now");
-        //
-        //  console.log(role_data);
-        // console.log(role_permission_data);
-        //
-        // var permissionArray = [];
-        // permissionArray.push(role_permission_data);
-        // role_data[0].permissions = permissionArray;
-        role_data[0].MODULES = role_permission_data.MODULES;
-        //
-        const Response = {
-          status: "success",
-          responsedata: { role: role_data },
-        };
-        res.status(200).json(Response);
-        //
-      } else {
-        console.log("Step 2 Process Error");
-        const Error = {
-          status: "error",
-          message: "Server Error",
-        };
-        res.status(400).json(Error);
-      }
-      //
-    } else {
-      console.log("Step 1 Process Error");
-      const Error = {
-        status: "error",
-        message: "Server Error",
-      };
-      res.status(400).json(Error);
-    }
-    //
+    res.status(g_status_code).json(g_response);
   } else {
-    console.log("Invalid Role Id");
+    console.log("Invalid url params");
     const Error = { status: "error", message: "Invalid Details" };
     res.status(400).json(Error);
   }
 };
-//-----------------------------------------------------------------------------------------------------------
+/*-----------Roles------------------------------ends here--------------------*/
+//
+/*-----------RolesByParent---------------------------starts here--------------------*/
+exports.RolesByParent = async (req, res) => {
+  var roleId;
+  let role_data = [];
+  var g_response = {};
+  var g_status_code;
+  if (req.params.id && req.params.id > 0) {
+    roleId = req.params.id;
+    try {
+      role_data = await fetch_roles_by_parent(roleId);
+      //console.log(role_data);
+      g_response["status"] = "success";
+      g_response["responsedata"] = { roles: role_data };
+      g_status_code = 200;
+    } catch (err) {
+      //console.log("catch entities : ", err);
+      g_response["status"] = "error";
+      g_response["message"] = err.message;
+      g_status_code = err.statusCode;
+    }
+    res.status(g_status_code).json(g_response);
+  }
+};
+/*-----------RolesByParent---------------------------ends here--------------------*/
+//
+//
+/*-----------TrashRole---------------------------starts here--------------------*/
+exports.Trash = async (req, res) => {
+  var roleId;
+  var g_response = {};
+  var g_status_code;
+  if (req.params.id && req.params.id > 0) {
+    roleId = req.params.id;
+    try {
+      const role_data = await trash_role(roleId);
+      //console.log(role_data);
+      g_response["status"] = "success";
+      g_response["message"] = role_data;
+      g_status_code = 201;
+    } catch (err) {
+      //console.log("catch entities : ", err);
+      g_response["status"] = "error";
+      g_response["message"] = err.message;
+      g_status_code = err.statusCode;
+    }
+    res.status(g_status_code).json(g_response);
+  }
+};
+/*-----------TrashRole---------------------------ends here--------------------*/
+//
+//
+/*-----------Delete---------------------------starts here--------------------*/
+exports.Delete = async (req, res) => {
+  var roleId;
+  var g_response = {};
+  var g_status_code;
+  if (req.params.id && req.params.id > 0) {
+    roleId = req.params.id;
+    try {
+      const role_data = await delete_role(roleId);
+      //console.log(role_data);
+      g_response["status"] = "success";
+      g_response["message"] = role_data;
+      g_status_code = 201;
+    } catch (err) {
+      //console.log("catch entities : ", err);
+      g_response["status"] = "error";
+      g_response["message"] = err.message;
+      g_status_code = err.statusCode;
+    }
+    res.status(g_status_code).json(g_response);
+  }
+};
+/*-----------Delete---------------------------ends here--------------------*/
+//
+//----FUNCTIONS----------------------------------------------------------STARTS
+const fetch_single_role = (roleId) => {
+  return new Promise((resolve, reject) => {
+    Role.fetchRole(roleId, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+const fetch_roles = () => {
+  return new Promise((resolve, reject) => {
+    Role.fetchRoles((err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+const fetch_roles_by_parent = (roleId) => {
+  return new Promise((resolve, reject) => {
+    Role.fetchRolesByParent(roleId, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+const trash_role = (roleId) => {
+  return new Promise((resolve, reject) => {
+    Role.trash(roleId, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+const delete_role = (roleId) => {
+  return new Promise((resolve, reject) => {
+    Role.delete(roleId, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+//----FUNCTIONS----------------------------------------------------------ENDS
+//
 // Add a role  into database table --role-DONE--------------------------------------------------------------
 const CreateRole = async (req, res) => {
   //1--title, parent_role, store_type, store_id, description
@@ -1198,54 +1107,3 @@ const UpdateRoleById = async (req, res) => {
   }
 };
 //-----------------------------------------------------------------------------------------------------------------
-// DELETE a role in database table --role--------------------------------------------------
-const DeleteRoleById = (req, res) => {
-  //
-  const encryptedRoleId = req.params.id;
-  //console.log(encryptedRoleId);
-  const roleId = decodetheid(encryptedRoleId);
-  //console.log(roleId);
-  const sql = con.query(
-    //  "DELETE FROM role WHERE id=?",
-    "UPDATE role SET trash = 1, active = 0 WHERE id=?",
-    [roleId],
-    (err, response) => {
-      //   console.log(response);
-      // if (typeof response === "undefined") {
-      //   const Response = {
-      //     data: { message: "Not Permitted to Delete" },
-      //   };
-      //   res.status(204).json(Response);
-      // } else
-      if (!err) {
-        //  console.log(response);
-        if (response && response.changedRows > 0) {
-          const Response = {
-            status: "success",
-            data: { message: "Role deleted successfully" },
-          };
-          res.status(200).json(Response);
-        } else {
-          console.log("Nothing UPDATED");
-          const Error = { status: "error", message: "Server Error" };
-          res.status(400).json(Error);
-        }
-      } else {
-        console.log(err);
-        const Error = { status: "error", message: "Server Error" };
-        res.status(400).json(Error);
-      }
-    }
-  );
-  console.log(sql.sql);
-};
-//-----------------------------------------------------------------------------------------------------------------
-
-module.exports = {
-  GetAllRoles,
-  //
-  GetRoleById,
-  CreateRole,
-  UpdateRoleById,
-  DeleteRoleById,
-};

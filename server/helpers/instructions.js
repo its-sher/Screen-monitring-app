@@ -1,6 +1,7 @@
 const con = require("../models/db");
+var Model = function () {};
 
-const sql_query = (sql_query_payload) => {
+Model.sql_query = (sql_query_payload) => {
   //console.log("Inside sql_query HELPER");-----onlyScript
   /*----------------payload example--------------------------
   let sql_query_payload = {
@@ -85,7 +86,7 @@ const sql_query = (sql_query_payload) => {
 //-----------------------------------------------------------------
 //
 //-----------------------------------------------------------------
-const add_query = (add_payload) => {
+Model.add_query = (add_payload) => {
   //console.log("Inside add_query HELPER");
   /*----------------payload example--------------------------
 let add_payload = {
@@ -161,7 +162,7 @@ let add_payload = {
 //-----------------------------------------------------------------
 //
 //-----------------------------------------------------------------
-const view_query = (view_payload) => {
+Model.view_query = (view_payload) => {
   //console.log("Inside view_query HELPER");
   /*----------------payload example--------------------------
    let view_payload = {
@@ -264,7 +265,7 @@ const view_query = (view_payload) => {
 //-----------------------------------------------------------------
 //
 //-----------------------------------------------------------------
-const edit_query = (update_payload) => {
+Model.edit_query = (update_payload) => {
   //console.log("Inside edit_query HELPER");
   /*----------------payload example--------------------------
      let update_payload = {
@@ -355,7 +356,7 @@ const edit_query = (update_payload) => {
 //-----------------------------------------------------------------
 //
 //-----------------------------------------------------------------
-const trash_query = (trash_payload) => {
+Model.trash_query = (trash_payload) => {
   //console.log("Inside trash_query HELPER");
   /*----------------payload example--------------------------
     let trash_payload = {
@@ -432,7 +433,7 @@ const trash_query = (trash_payload) => {
 };
 //-----------------------------------------------------------------
 //
-const delete_query = (delete_payload) => {
+Model.delete_query = (delete_payload) => {
   //console.log("Inside delete_query");
   /*----------------payload example--------------------------
   console.log(delete_payload);
@@ -512,9 +513,9 @@ const delete_query = (delete_payload) => {
 };
 //-----------------------------------------------------------------
 //
-const error_query = async (error) => {
+Model.error_query = async (error) => {
   //console.log("Inside Error Helper");
-  console.log(error);
+  //console.log(error);
   var messageERR;
   var code;
   var f;
@@ -525,7 +526,7 @@ const error_query = async (error) => {
       messageERR = error.sqlMessage;
       code = 400;
     } else if (error == "NO_DATA" || error.code == "NO_DATA") {
-      messageERR = error.sqlMessage;
+      messageERR = error;
       code = 204;
     } else if (error.code == "INVALID_SQL_PARAMS") {
       messageERR = error.sqlMessage;
@@ -585,13 +586,4 @@ const error_query = async (error) => {
   }
 };
 //-----------------------------------------------------------------
-//
-module.exports = {
-  sql_query,
-  error_query,
-  add_query,
-  view_query,
-  edit_query,
-  delete_query,
-  trash_query,
-};
+module.exports = Model;
