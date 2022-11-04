@@ -8,44 +8,13 @@ var Role = function () {};
 //
 /*-----------fetchRole------------------------------starts here--------------------*/
 Role.fetchRole = async (roleId, result) => {
-  var role_data;
   let sql_query_payload = {
     sql_script: `SELECT r.id, r.title, r.parent_role, r1.title as parent_role_name, r.description, r.active FROM ${table_role} as r LEFT JOIN ${table_role} as r1 ON r1.id=r.parent_role WHERE r.id=${roleId}`,
     method: "get",
   };
   const respRole = await Model.sql_query(sql_query_payload);
   if (respRole.status == "success") {
-    role_data = respRole.data;
-    //result(null, respRole.data);
-    //NEXT STEP---------------------------------------STARTS****************
-    let sql_query_payload1 = {
-      sql_script: `SELECT concat('"MODULES":{', GROUP_CONCAT(concat('"',m.name,'":"',urp.access,'"') SEPARATOR ','),'}') as data FROM ${table_permission} as urp LEFT JOIN ${table_module} as m ON m.id=urp.module_id LEFT JOIN ${table_role} as r ON r.id=urp.role_id WHERE urp.role_id=${roleId} GROUP BY r.title`,
-      method: "get",
-    };
-    const respPermission = await Model.sql_query(sql_query_payload1);
-    if (respPermission.status == "success") {
-      //now add curly braces and make json string---starts
-      const jsonStringData = "{" + respPermission.data[0].data + "}";
-      //now add curly braces and make json string---ends
-      //
-      //nw parse the data-----------------STARTS
-      const jsonParsedData = JSON.parse(jsonStringData);
-      //nw parse the data-----------------ENDS
-      //
-      role_data[0]["MODULES"] = jsonParsedData.MODULES;
-      //
-      result(null, role_data);
-    } else if (respPermission.status == "error") {
-      const err = respPermission.message;
-      const respError = await Model.error_query(err);
-      const Error = {
-        status: "error",
-        message: respError.message,
-        statusCode: respError.statusCode,
-      };
-      result(Error, null);
-    }
-    //NEXT STEP---------------------------------------ENDS****************
+    result(null, respRole.data);
   } else if (respRole.status == "error") {
     const err = respRole.message;
     const respError = await Model.error_query(err);
@@ -104,6 +73,35 @@ Role.fetchRolesByParent = async (roleId, result) => {
 };
 /*-----------fetchRoleByParent------------------------------ends here--------------------*/
 //
+/*-----------fetchRolePermission------------------------------starts here--------------------*/
+Role.fetchRolePermission = async (roleId, result) => {
+  let sql_query_payload = {
+    sql_script: `SELECT concat('"MODULES":{', GROUP_CONCAT(concat('"',m.name,'":"',urp.access,'"') SEPARATOR ','),'}') as data FROM ${table_permission} as urp LEFT JOIN ${table_module} as m ON m.id=urp.module_id LEFT JOIN ${table_role} as r ON r.id=urp.role_id WHERE urp.role_id=${roleId} GROUP BY r.title`,
+    method: "get",
+  };
+  const respPermission = await Model.sql_query(sql_query_payload);
+  if (respPermission.status == "success") {
+    //now add curly braces and make json string---starts
+    const jsonStringData = "{" + respPermission.data[0].data + "}";
+    //now add curly braces and make json string---ends
+    //
+    //nw parse the data-----------------STARTS
+    const jsonParsedData = JSON.parse(jsonStringData);
+    //nw parse the data-----------------ENDS
+    //
+    result(null, jsonParsedData.MODULES);
+  } else if (respPermission.status == "error") {
+    const err = respPermission.message;
+    const respError = await Model.error_query(err);
+    const Error = {
+      status: "error",
+      message: respError.message,
+      statusCode: respError.statusCode,
+    };
+    result(Error, null);
+  }
+};
+/*-----------fetchRolePermission------------------------------ends here--------------------*/
 //
 /*-----------trash------------------------------starts here--------------------*/
 Role.trash = async (roleId, result) => {
@@ -116,7 +114,6 @@ Role.trash = async (roleId, result) => {
       trash: 1,
     },
   };
-  //console.log(delete_payload);
   const respDelete = await Model.trash_query(delete_payload);
   if (respDelete.status == "success") {
     const message = "Role Deleted Successfully";
@@ -141,7 +138,6 @@ Role.delete = async (roleId, result) => {
     query_field: "id",
     query_value: roleId,
   };
-  //console.log(delete_payload);
   const respDelete = await Model.delete_query(delete_payload);
   if (respDelete.status == "success") {
     const message = "Role Deleted Successfully";
@@ -159,4 +155,144 @@ Role.delete = async (roleId, result) => {
 };
 /*-----------delete------------------------------ends here--------------------*/
 //
+/*-----------createRole------------------------------starts here--------------------*/
+Role.createRole = async (saveData, result) => {
+  //CREATE ROLE-------------------------STARTS
+  let add_payload = {
+    table_name: table_role,
+    dataToSave: saveData,
+  };
+  const respAdd = await Model.add_query(add_payload);
+  if (respAdd.status == "success") {
+    const id = respAdd.id;
+    //Get data for created ROLE-------------STARTS++++++++++++++++++++++
+    let sql_query_payload = {
+      sql_script: `SELECT r.id, r.title, r.parent_role, r1.title as parent_role_name, r.description, r.active FROM ${table_role} as r LEFT JOIN ${table_role} as r1 ON r1.id=r.parent_role WHERE r.id=${id}`,
+      method: "get",
+    };
+    const respRole = await Model.sql_query(sql_query_payload);
+    if (respRole.status == "success") {
+      result(null, respRole.data);
+    } else if (respRole.status == "error") {
+      const err = respRole.message;
+      const respError = await Model.error_query(err);
+      const Error = {
+        status: "error",
+        message: respError.message,
+        statusCode: respError.statusCode,
+      };
+      result(Error, null);
+    }
+    //Get data for created ROLE-------------ENDS++++++++++++++++++++++
+  } else if (respAdd.status == "error") {
+    const err = respAdd.message;
+    const respError = await Model.error_query(err);
+    const Error = {
+      status: "error",
+      message: respError.message,
+      statusCode: respError.statusCode,
+    };
+    result(Error, null);
+  }
+  //CREATE ROLE-------------------------ENDS
+};
+/*-----------createRole------------------------------ends here--------------------*/
+//
+/*-----------fetchModules------------------------------starts here--------------------*/
+Role.fetchModules = async (result) => {
+  let sql_query_payload = {
+    sql_script: `SELECT id, name FROM ${table_module} WHERE active = 1 AND trash = 0`,
+    method: "get",
+  };
+  const respSql = await Model.sql_query(sql_query_payload);
+  if (respSql.status == "success") {
+    result(null, respSql.data);
+  } else if (respSql.status == "error") {
+    const err = respSql.message;
+    const respError = await Model.error_query(err);
+    const Error = {
+      status: "error",
+      message: respError.message,
+      statusCode: respError.statusCode,
+    };
+    result(Error, null);
+  }
+};
+/*-----------fetchModules------------------------------ends here--------------------*/
+//
+/*-----------createRolePermission------------------------------starts here--------------------*/
+Role.createRolePermission = async (saveData, result) => {
+  //CREATE ROLE PERMISSION-------------------------STARTS
+  console.log(saveData);
+  const sql = con.query(
+    "INSERT INTO role_permission (role_id, module_id, access) VALUES ?",
+    [saveData],
+    async (err, result1) => {
+      if (!err) {
+        if (result1 && result1.affectedRows > 0) {
+          const LLastID = result1.insertId;
+          const Response = {
+            status: "success",
+            id: LLastID,
+          };
+          result(null, Response);
+        } else {
+          const Error = {
+            status: "error",
+            message: "error",
+          };
+          if (Error.status == "error") {
+            const err = Error.message;
+            const respError = await Model.error_query(err);
+            const Error = {
+              status: "error",
+              message: respError.message,
+              statusCode: respError.statusCode,
+            };
+            result(Error, null);
+          }
+        }
+      } else {
+        console.log(err);
+        const Error = {
+          status: "error",
+          message: err,
+        };
+        if (Error.status == "error") {
+          const err = Error.message;
+          const respError = await Model.error_query(err);
+          const Error = {
+            status: "error",
+            message: respError.message,
+            statusCode: respError.statusCode,
+          };
+          result(Error, null);
+        }
+      }
+    }
+  );
+  //console.log(sql.sql);
+  // let sql_query_payload = {
+  //   sql_script: `"INSERT INTO role_permission (role_id, module_id, access) VALUES ?",
+  //   ${saveData}`,
+  //   method: "get",
+  // };
+  // const respAdd = await Model.sql_query(sql_query_payload);
+  // if (respAdd.status == "success") {
+  //   result(null, respAdd);
+  // } else if (respAdd.status == "error") {
+  //   const err = respAdd.message;
+  //   const respError = await Model.error_query(err);
+  //   const Error = {
+  //     status: "error",
+  //     message: respError.message,
+  //     statusCode: respError.statusCode,
+  //   };
+  //   result(Error, null);
+  // }
+  //CREATE ROLE PERMISSION-------------------------ENDS
+};
+/*-----------createRolePermission------------------------------ends here--------------------*/
+//
+
 module.exports = Role;

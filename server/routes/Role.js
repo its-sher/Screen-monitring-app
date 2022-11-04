@@ -8,9 +8,9 @@ router.get("/", roleCtrl.Roles);
 router.get("/parent/:id", roleCtrl.RolesByParent);
 router.delete("/:id", roleCtrl.Delete); //checkrole,
 router.delete("/trash/:id", roleCtrl.Trash); //checkrole
+router.post("/", roleCtrl.CreateRole);
 //
 //
-//router.post("/", userController.CreateRole);
 //router.put("/:id", userController.UpdateRoleById);
 //
 module.exports = router;
