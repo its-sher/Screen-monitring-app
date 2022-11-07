@@ -233,7 +233,6 @@ Role.createRolePermission = async (saveData, result) => {
           const LLastID = result1.insertId;
           const Response = {
             status: "success",
-            id: LLastID,
           };
           result(null, Response);
         } else {
@@ -293,6 +292,59 @@ Role.createRolePermission = async (saveData, result) => {
   //CREATE ROLE PERMISSION-------------------------ENDS
 };
 /*-----------createRolePermission------------------------------ends here--------------------*/
+//
+/*-----------updateRole------------------------------starts here--------------------*/
+Role.updateRole = async (data, result) => {
+  const role_id = data.id;
+  const update_data = data.data;
+  let update_payload = {
+    table_name: table_role,
+    query_field: "id",
+    query_value: role_id,
+    dataToSave: update_data,
+  };
+  const respEdit = await Model.edit_query(update_payload);
+  if (respEdit.status == "success") {
+    const Response = {
+      status: "success",
+    };
+    result(null, Response);
+  } else if (respEdit.status == "error") {
+    const err = respEdit.message;
+    const respError = await Model.error_query(err);
+    const Error = {
+      status: "error",
+      message: respError.message,
+      statusCode: respError.statusCode,
+    };
+    result(Error, null);
+  }
+};
+/*-----------updateRole------------------------------ends here--------------------*/
+//
+/*-----------deleteRolePermissions------------------------------starts here--------------------*/
+Role.deleteRolePermissions = async (roleId, result) => {
+  let delete_payload = {
+    table_name: table_permission,
+    query_field: "role_id",
+    query_value: roleId,
+  };
+  const respDelete = await Model.delete_query(delete_payload);
+  if (respDelete.status == "success") {
+    const message = "Role Deleted Successfully";
+    result(null, message);
+  } else if (respDelete.status == "error") {
+    const err = respDelete.message;
+    const respError = await Model.error_query(err);
+    const Error = {
+      status: "error",
+      message: respError.message,
+      statusCode: respError.statusCode,
+    };
+    result(Error, null);
+  }
+};
+/*-----------deleteRolePermissions------------------------------ends here--------------------*/
 //
 
 module.exports = Role;

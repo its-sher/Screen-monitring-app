@@ -9,10 +9,6 @@ router.get("/parent/:id", roleCtrl.RolesByParent);
 router.delete("/:id", roleCtrl.Delete); //checkrole,
 router.delete("/trash/:id", roleCtrl.Trash); //checkrole
 router.post("/", roleCtrl.CreateRole);
-//
-//
-//router.put("/:id", userController.UpdateRoleById);
+router.put("/:id", roleCtrl.UpdateRole);
 //
 module.exports = router;
-
-//all no query string

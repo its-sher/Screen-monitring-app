@@ -42,7 +42,6 @@ exports.Roles = async (req, res) => {
     }
     res.status(g_status_code).json(g_response);
   } else {
-    console.log("Invalid url params");
     const Error = { status: "error", message: "Invalid Details" };
     res.status(400).json(Error);
   }
@@ -70,6 +69,9 @@ exports.RolesByParent = async (req, res) => {
       g_status_code = err.statusCode;
     }
     res.status(g_status_code).json(g_response);
+  } else {
+    const Error = { status: "error", message: "Invalid Details" };
+    res.status(400).json(Error);
   }
 };
 /*-----------RolesByParent---------------------------ends here--------------------*/
@@ -95,6 +97,9 @@ exports.Trash = async (req, res) => {
       g_status_code = err.statusCode;
     }
     res.status(g_status_code).json(g_response);
+  } else {
+    const Error = { status: "error", message: "Invalid Details" };
+    res.status(400).json(Error);
   }
 };
 /*-----------TrashRole---------------------------ends here--------------------*/
@@ -107,18 +112,26 @@ exports.Delete = async (req, res) => {
   if (req.params.id && req.params.id > 0) {
     roleId = req.params.id;
     try {
-      const role_data = await delete_role(roleId);
-      //console.log(role_data);
-      g_response["status"] = "success";
-      g_response["message"] = role_data;
-      g_status_code = 201;
+      const role_permission_delete_data = await delete_role_permissions(roleId);
+      try {
+        const role_data = await delete_role(roleId);
+        g_response["status"] = "success";
+        g_response["message"] = role_data;
+        g_status_code = 201;
+      } catch (err) {
+        g_response["status"] = "error";
+        g_response["message"] = err.message;
+        g_status_code = err.statusCode;
+      }
     } catch (err) {
-      //console.log("catch entities : ", err);
       g_response["status"] = "error";
       g_response["message"] = err.message;
       g_status_code = err.statusCode;
     }
     res.status(g_status_code).json(g_response);
+  } else {
+    const Error = { status: "error", message: "Invalid Details" };
+    res.status(400).json(Error);
   }
 };
 /*-----------Delete---------------------------ends here--------------------*/
@@ -146,7 +159,6 @@ exports.CreateRole = async (req, res) => {
             const result_data = await create_role_permission(
               final_permission_table_data
             );
-            console.log(result_data);
             g_response["status"] = "success";
             g_response["responsedata"] = "Role Created Successfully";
             g_status_code = 201;
@@ -178,6 +190,153 @@ exports.CreateRole = async (req, res) => {
   res.status(g_status_code).json(g_response);
 };
 /*-----------CreateRole---------------------------ends here--------------------*/
+//
+/*-----------UpdateRole---------------------------starts here--------------------*/
+exports.UpdateRole = async (req, res) => {
+  var g_response = {};
+  var g_status_code;
+  try {
+    const check_data = await update_role_check_data(req);
+    var role_id = req.params.id;
+    try {
+      const sorted_role_permission_data = await update_role_data_sort(req);
+      var roleTableData = sorted_role_permission_data.roleTableData;
+      var rolePermissionTableData =
+        sorted_role_permission_data.rolePermissionTableData;
+      if (
+        roleTableData &&
+        roleTableData !== undefined &&
+        Object.keys(roleTableData).length != 0
+      ) {
+        //Role table data to update exists-------------------
+        const edit_payload = {
+          id: role_id,
+          data: roleTableData,
+        };
+        try {
+          const role_data = await update_role(edit_payload);
+          if (
+            rolePermissionTableData &&
+            rolePermissionTableData !== undefined &&
+            Object.keys(rolePermissionTableData).length != 0
+          ) {
+            //Role_Permission table data to update exists-------------------
+            try {
+              const role_permission_delete_data = await delete_role_permissions(
+                role_id
+              );
+              try {
+                const module_data = await fetch_modules();
+                try {
+                  const final_permission_table_data =
+                    await merge_modules_permissions(
+                      role_id,
+                      module_data,
+                      rolePermissionTableData
+                    );
+                  try {
+                    const result_data = await create_role_permission(
+                      final_permission_table_data
+                    );
+                    g_response["status"] = "success";
+                    g_response["responsedata"] = "Role Created Successfully";
+                    g_status_code = 201;
+                  } catch (err) {
+                    g_response["status"] = "error";
+                    g_response["message"] = err.message;
+                    g_status_code = err.statusCode;
+                  }
+                } catch (err) {
+                  g_response["status"] = "error";
+                  g_response["message"] = err.message;
+                  g_status_code = err.statusCode;
+                }
+              } catch (err) {
+                g_response["status"] = "error";
+                g_response["message"] = err.message;
+                g_status_code = err.statusCode;
+              }
+            } catch (err) {
+              g_response["status"] = "error";
+              g_response["message"] = err.message;
+              g_status_code = err.statusCode;
+            }
+          } else {
+            //Only role data present which is updated----------------
+            g_response["status"] = "success";
+            g_response["responsedata"] = "Role Updated Successfully";
+            g_status_code = 200;
+          }
+        } catch (err) {
+          g_response["status"] = "error";
+          g_response["message"] = err.message;
+          g_status_code = err.statusCode;
+        }
+      } else if (
+        rolePermissionTableData &&
+        rolePermissionTableData !== undefined &&
+        Object.keys(rolePermissionTableData).length != 0
+      ) {
+        //Role_Permission table data to update exists-------------------
+        try {
+          const role_permission_delete_data = await delete_role_permissions(
+            role_id
+          );
+          try {
+            const module_data = await fetch_modules();
+            try {
+              const final_permission_table_data =
+                await merge_modules_permissions(
+                  role_id,
+                  module_data,
+                  rolePermissionTableData
+                );
+              try {
+                const result_data = await create_role_permission(
+                  final_permission_table_data
+                );
+                g_response["status"] = "success";
+                g_response["responsedata"] = "Role Created Successfully";
+                g_status_code = 201;
+              } catch (err) {
+                g_response["status"] = "error";
+                g_response["message"] = err.message;
+                g_status_code = err.statusCode;
+              }
+            } catch (err) {
+              g_response["status"] = "error";
+              g_response["message"] = err.message;
+              g_status_code = err.statusCode;
+            }
+          } catch (err) {
+            g_response["status"] = "error";
+            g_response["message"] = err.message;
+            g_status_code = err.statusCode;
+          }
+        } catch (err) {
+          g_response["status"] = "error";
+          g_response["message"] = err.message;
+          g_status_code = err.statusCode;
+        }
+      } else {
+        //No data to update------------------------
+        g_response["status"] = "error";
+        g_response["message"] = "Invalid Details";
+        g_status_code = 400;
+      }
+    } catch (err) {
+      g_response["status"] = "error";
+      g_response["message"] = err.message;
+      g_status_code = err.statusCode;
+    }
+  } catch (err) {
+    g_response["status"] = "error";
+    g_response["message"] = err.message;
+    g_status_code = err.statusCode;
+  }
+  res.status(g_status_code).json(g_response);
+};
+/*-----------UpdateRole---------------------------ends here--------------------*/
 //
 //----FUNCTIONS----------------------------------------------------------STARTS
 const fetch_single_role = (roleId) => {
@@ -259,6 +418,9 @@ const create_role_data_sort = (data) => {
       if (data.hasOwnProperty("description")) {
         roleTableData.description = data.description;
       }
+      if (data.hasOwnProperty("active")) {
+        roleTableData.active = data.active;
+      }
       //  console.log(roleTableData);
       //Data for role table--------------ENDS
       //
@@ -331,521 +493,86 @@ const create_role_permission = (data) => {
     });
   });
 };
-//----FUNCTIONS----------------------------------------------------------ENDS
-//-----------------------------------------------------------------------------------------------------------------
-// UPDATE a role  in database table --role-----------------------------------------------
-const UpdateRoleById = async (req, res) => {
-  console.log("Inside UpdateRoleById");
-  //console.log(req.body);
-  //
-  const data = req.body;
-  //console.log(data);
-  //
-  const encryptedRoleId = req.params.id;
-  const roleId = decodetheid(encryptedRoleId);
-  //console.log(roleId);
-  //
-
-  if (roleId && roleId > 0 && data && "key" in data !== "undefined") {
-    console.log("Valid Details");
-    //
-    var role_data = {};
-    var role_permissions_data = {};
-    let filteredData = data;
-    // if (
-    //   data.hasOwnProperty("active") &&
-    //   (data.active == 0 || data.active == 1)
-    // ) {
-    //   role_data.active = data.active;
-    // }
-    //
-    // let filteredData = Object.fromEntries(
-    //   Object.entries(data).filter(
-    //     ([_, v]) => v != "null" && v != "" && v != null
-    //   )
-    // );
-    //  console.log(filteredData);
-    //
+const update_role_check_data = (data) => {
+  return new Promise((resolve, reject) => {
     if (
-      filteredData &&
-      filteredData !== undefined &&
-      Object.keys(filteredData).length != 0
+      data.params.id &&
+      data.params.id > 0 &&
+      data.body &&
+      data.body !== undefined &&
+      Object.keys(data.body).length != 0
     ) {
-      //
-      if (
-        filteredData.hasOwnProperty("title") &&
-        filteredData.title.length > 0
-      ) {
-        role_data.title = filteredData.title;
-      }
-      if (
-        filteredData.hasOwnProperty("description")
-        // &&
-        // filteredData.description.length > 0
-      ) {
-        role_data.description = filteredData.description;
-      }
-      if (
-        filteredData.hasOwnProperty("parent_role") &&
-        (filteredData.parent_role > 0 || filteredData.parent_role == null)
-      ) {
-        role_data.parent_role = filteredData.parent_role;
-      }
-      if (
-        filteredData.hasOwnProperty("store_type") &&
-        filteredData.store_type > 0
-      ) {
-        role_data.store_type = filteredData.store_type;
-      }
-      if (
-        filteredData.hasOwnProperty("store_id") &&
-        filteredData.store_id > 0
-      ) {
-        role_data.store_id = filteredData.store_id;
-      }
-      if (filteredData.hasOwnProperty("active")) {
-        role_data.active = filteredData.active;
-      }
-      if (filteredData.hasOwnProperty("MODULES")) {
-        role_permissions_data = filteredData.MODULES;
-      }
-
-      console.log(role_data);
-      console.log(role_permissions_data);
-      //
-      //
-      //STEP-1 Update Store Type data ---++++++++++++++STARTS
-      //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //
-      var messageERR;
-      var role_update_data_resp = {};
-      var delete_role_permissions_data_resp = {};
-      var modules_data = {};
-      var modules_data_resp = {};
-      var save_role_permissions_data_resp = {};
-      //
-      async function updateRoleData(saveData, roleID) {
-        console.log("Inside updateRoleData");
-        return new Promise((resolve, reject) => {
-          //   console.log(roleID);
-          //
-          const sql = con.query(
-            "UPDATE role SET ? WHERE id=?",
-            [saveData, roleID],
-            (err, result) => {
-              if (!err) {
-                //   console.log(result);
-                //   console.log(result.affectedRows);
-                if (result.affectedRows > 0) {
-                  console.log("STEP-1 --> Updated role successful");
-                  resolve({
-                    result: 1,
-                  });
-                } else {
-                  console.log("NOTHING UPDATED - case shouldn't work");
-                  messageERR = "Invalid Details";
-                  // const Error = { status: "error", message: "Invalid Details" };
-                  // res.status(400).json(Error);
-                  reject({
-                    result: 0,
-                  });
-                }
-              } else {
-                console.log("UPDATE SLQ ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                console.log(err);
-                messageERR = "Server Error";
-                //  const Error = { status: "error", message: "Server Error" };
-                //   res.status(400).json(Error);
-                reject({
-                  result: 0,
-                });
-              }
-            }
-          );
-          // console.log(sql.sql);
-          //
-          //
-        }).catch((error) => console.log(error.message));
-      }
-      role_update_data_resp = await updateRoleData(role_data, roleId);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      console.log(role_update_data_resp);
-      console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-      //STEP-1 Update Store Type data ---++++++++++++++ENDS
-      //STEP++++++++++++++++ENDS++++++++++++++++++++++++++
-      //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      //
-      if (
-        role_update_data_resp &&
-        role_update_data_resp !== undefined &&
-        Object.keys(role_update_data_resp).length != 0 &&
-        role_update_data_resp.result > 0
-      ) {
-        console.log("STEP-1 DONE SUCCESSFULLY");
-        console.log("STEP-2 STARTS");
-        //
-        if (
-          filteredData.hasOwnProperty("MODULES") &&
-          filteredData.MODULES &&
-          filteredData.MODULES !== undefined &&
-          Object.keys(filteredData.MODULES).length != 0
-        ) {
-          console.log("ROLE, PERMISSIONS EXISTS");
-
-          //////////////////////////////STEP-2///////////////////////
-          //DELETE all role_permissions of this role--starts
-          //
-          async function deleteRolePermissions(roleID) {
-            console.log("Inside deleteRolePermissions");
-
-            return new Promise((resolve, reject) => {
-              //   console.log(roleID);
-              //
-              const sql1 = con.query(
-                "DELETE FROM role_permission WHERE role_id=?",
-                [roleID],
-                (err, response) => {
-                  // console.log(response);
-                  if (typeof response === "undefined") {
-                    messageERR = "Not Permitted to Delete";
-                    // const Response = {
-                    //   data: { message: "Not Permitted to Delete" },
-                    // };
-                    // res.status(204).json(Response);
-                    reject({
-                      result: 0,
-                    });
-                  } else if (!err) {
-                    if (response && response.affectedRows > 0) {
-                      console.log(
-                        "Step-2 role permissions deleted successfully"
-                      );
-                      resolve({
-                        result: 1,
-                      });
-                    } else {
-                      console.log("STEP_2 ERROR");
-                      console.log("SQL ERROR - Nothing deleted");
-                      messageERR = "Server Error";
-                      // const Error = {
-                      //   status: "error",
-                      //   message: "No Data",
-                      // };
-                      // res.status(204).json(Response);
-                      reject({
-                        result: 0,
-                      });
-                    }
-                  } else {
-                    console.log("STEP_2 ERROR");
-                    console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                    console.log("Delete role permissions sql error");
-                    console.log(err);
-                    messageERR = "Server Error";
-                    // const Error = {
-                    //   status: "error",
-                    //   message: "Server Error",
-                    // };
-                    // res.status(400).json(Error);
-                    reject({
-                      result: 0,
-                    });
-                  }
-                }
-              );
-              console.log(sql1.sql);
-              //
-            }).catch((error) => console.log(error.message));
-          }
-          delete_role_permissions_data_resp = await deleteRolePermissions(
-            roleId
-          );
-          console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-          // console.log(delete_role_permissions_data_resp);
-          console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-          //
-          //DELETE all role_permissions of this role--ends
-          //////////////////////////////STEP-2///////////////////////
-          //
-          if (
-            delete_role_permissions_data_resp &&
-            delete_role_permissions_data_resp !== undefined &&
-            Object.keys(delete_role_permissions_data_resp).length != 0 &&
-            delete_role_permissions_data_resp.result > 0
-          ) {
-            console.log("STEP-2 DONE SUCCESSFULLY");
-            console.log("STEP-3 STARTS");
-            //
-            //STEP-3 NOW GET ALL MODULES MADE BY SUPER-ADMIN---++++++++++++++starts
-            //STEP++++++++++++++++STARTS++++++++++++++++++++++++++
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //
-            async function getModulesData() {
-              console.log("Inside getModulesData");
-              return new Promise((resolve, reject) => {
-                //   console.log(saveData);
-                //
-                const sql1 = con.query(
-                  "SELECT id, name FROM modules WHERE active = 1 AND trash = 0", //, parent_id, slug, active, trash, created_at, updated_at
-                  (err, response) => {
-                    if (!err) {
-                      if (response && response.length > 0) {
-                        console.log("modules_data get success");
-                        //array is defined and is not empty
-                        //console.log(response);
-                        //
-                        //removing row data packet-------------STARTS
-                        var resultArray = Object.values(
-                          JSON.parse(JSON.stringify(response))
-                        );
-                        // console.log(resultArray);
-                        //removing row data packet-------------ENDS
-                        //
-                        // const Response = {
-                        //   status: "success",
-                        //   responsedata: { modules: resultArray },
-                        // };
-                        // res.status(200).json(Response);
-                        modules_data = resultArray; //data into global variable
-                        //GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
-                        resolve({
-                          result: 1,
-                        });
-                      } else {
-                        console.log("STEP_3 ERROR");
-                        console.log(
-                          "SQL ERROR - No data Got - Sql Query - Modules"
-                        );
-                        messageERR = "Server Error";
-                        // const Error = {
-                        //   status: "error",
-                        //   message: "No Data",
-                        // };
-                        // res.status(204).json(Response);
-                        reject({
-                          result: 0,
-                        });
-                      }
-                    } else {
-                      console.log("STEP_3 ERROR");
-                      console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                      console.log("Get Modules sql error");
-                      console.log(err);
-                      messageERR = "Server Error";
-                      // const Error = {
-                      //   status: "error",
-                      //   message: "Server Error",
-                      // };
-                      // res.status(400).json(Error);
-                      reject({
-                        result: 0,
-                      });
-                    }
-                  }
-                );
-                console.log(sql1.sql);
-                //
-              }).catch((error) => console.log(error.message));
-            }
-            modules_data_resp = await getModulesData();
-            console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-            // console.log(modules_data_resp);
-            console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-            //STEP-3 NOW GET ALL MODULES MADE BY SUPER-ADMIN---++++++++++++++ends
-            //STEP++++++++++++++++ENDS++++++++++++++++++++++++++
-            //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            //
-            if (
-              modules_data_resp &&
-              modules_data_resp !== undefined &&
-              Object.keys(modules_data_resp).length != 0 &&
-              modules_data_resp.result > 0
-            ) {
-              console.log("STEP-3 DONE SUCCESSFULLY");
-              console.log("STEP-4 STARTS");
-              //DATA MATCH N COMPILE -------------------STARTS
-              var result = Object.entries(role_permissions_data);
-              //   console.log(result);
-              //
-              var arrRolePermissionInsert = [];
-              modules_data.map((item) => {
-                result.map((item1) => {
-                  if (item1[0] == item.name) {
-                    arrRolePermissionInsert.push([
-                      roleId, //role_id,
-                      item.id, // module_id,
-                      item1[1],
-                    ]);
-                    //role_id, module_id, access
-                  }
-                });
-              });
-              console.log(arrRolePermissionInsert);
-              //DATA MATCH N COMPILE -------------------ENDS
-              if (arrRolePermissionInsert.length > 0) {
-                console.log(
-                  "Array data there to save permissions in role_permissions"
-                );
-                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                const saveRolePermissions = async (dataTosave) => {
-                  console.log("Inside saveRolePermissions");
-                  return new Promise((resolve, reject) => {
-                    //LOOP - for inserting - STARTS-&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-                    //
-                    //SQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL--STARTS
-                    const sql = con.query(
-                      "INSERT INTO role_permission (role_id, module_id, access) VALUES ?",
-                      [dataTosave],
-                      (err, result) => {
-                        if (!err) {
-                          if (result && result.affectedRows > 0) {
-                            console.log("Step-4 -- Insert Success");
-                            resolve({
-                              result: 1,
-                            });
-                          } else {
-                            console.log("STEP_4 ERROR");
-                            console.log("Nothing Inserted");
-                            console.log(
-                              "SQL ERROR - insert Query - role_permission"
-                            );
-                            messageERR = "Server Error";
-                            // const Error = {
-                            //   status: "error",
-                            //   message: "Server Error",
-                            // };
-                            // res.status(400).json(Error);
-                            reject({
-                              result: 0,
-                            });
-                          }
-                        } else {
-                          console.log("STEP_4 ERROR");
-                          console.log("ERRRRRRRRRRRRRRRRORRRRRRRRRR");
-                          console.log("Insert role_permission sql error");
-                          console.log(err);
-                          messageERR = "Server Error";
-                          // const Error = {
-                          //   status: "error",
-                          //   message: "Server Error",
-                          // };
-                          // res.status(400).json(Error);
-                          reject({
-                            result: 0,
-                          });
-                        }
-                      }
-                    );
-                    console.log(sql.sql);
-                    //SQLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL--ENDS
-                    //
-                    //LOOP - for inserting - ENDS-&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-                  }).catch((error) => console.log(error.message));
-                };
-                save_role_permissions_data_resp = await saveRolePermissions(
-                  arrRolePermissionInsert
-                );
-                console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-                // console.log(
-                //   save_role_permissions_data_resp
-                // );
-                console.log("XXXXXXXXXXXXXXXXXXXXXXXX");
-                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                //
-                if (
-                  save_role_permissions_data_resp &&
-                  save_role_permissions_data_resp !== undefined &&
-                  Object.keys(save_role_permissions_data_resp).length != 0 &&
-                  save_role_permissions_data_resp.result > 0
-                ) {
-                  console.log("Everything done");
-                  const Response = {
-                    status: "success",
-                    message: "Updated Successfully",
-                  };
-                  res.status(200).json(Response);
-                } else {
-                  console.log("STEP 4 Error");
-                  const Error = {
-                    status: "error",
-                    message: messageERR,
-                    // message: "Server Error",
-                  };
-                  res.status(400).json(Error);
-                }
-                //
-              } else {
-                console.log("STEP 4 Error");
-                console.log(
-                  "No Array Data to save permissions in role_permissions"
-                );
-                const Error = {
-                  status: "error",
-                  message: messageERR,
-                  //  message: "Server Error",
-                };
-                res.status(400).json(Error);
-              }
-            } else {
-              console.log("STEP 3 Error");
-              const Error = {
-                status: "error",
-                message: messageERR,
-              };
-              res.status(400).json(Error);
-            }
-            //=====================================================================================
-
-            //
-            //
-          } else {
-            console.log("STEP 2 Error");
-            const Error = {
-              status: "error",
-              message: messageERR,
-              // message: "Server Error",
-            };
-            res.status(400).json(Error);
-          }
-        } else {
-          console.log("ROLE PERMISSIONS DONT EXIST");
-          console.log("Everything done");
-          const Response = {
-            status: "success",
-            message: "Updated Successfully",
-          };
-          res.status(200).json(Response);
-        }
-      } else {
-        console.log("STEP 1 Error");
-        const Error = {
-          status: "error",
-          message: messageERR,
-        };
-        res.status(400).json(Error);
-      }
-      //
-      // const Response = {
-      //   status: "success",
-      //   responsedata: { role: resultArray },
-      // };
-      // res.status(200).json(Response);
+      resolve(true);
     } else {
-      console.log("Invalid Details");
-      const Error = { status: "error", message: "Invalid Details" };
-      res.status(400).json(Error);
+      const Error = { statusCode: 400, message: "Invalid Details" };
+      reject(Error);
     }
-  } else {
-    console.log("Invalid Details");
-    const Error = { status: "error", message: "Invalid Details" };
-    res.status(400).json(Error);
-  }
+  });
 };
+const update_role_data_sort = (req_data) => {
+  return new Promise((resolve, reject) => {
+    const data = req_data.body;
+    var roleTableData = {};
+    var rolePermissionTableData = {};
+    //Data for role table--------------_STARTS
+    if (data.hasOwnProperty("title") && data.title.length > 0) {
+      roleTableData["title"] = data.title;
+    }
+    if (data.hasOwnProperty("description")) {
+      roleTableData["description"] = data.description;
+    }
+    if (
+      data.hasOwnProperty("parent_role") &&
+      (data.parent_role > 0 || data.parent_role == null)
+    ) {
+      roleTableData["parent_role"] = data.parent_role;
+    }
+    if (
+      data.hasOwnProperty("active") &&
+      (data.active == 0 || data.active == 1)
+    ) {
+      roleTableData.active = data.active;
+    }
+    //  console.log(roleTableData);
+    //Data for role table--------------ENDS
+    //
+    //Data for role_permission table--------------_STARTS
+    if (
+      data.hasOwnProperty("MODULES") &&
+      data.MODULES !== undefined &&
+      Object.keys(data.MODULES).length != 0
+    ) {
+      rolePermissionTableData = data.MODULES;
+    }
+    //  console.log(rolePermissionTableData);
+    //Data for role_permission table--------------ENDS
+    //
+    const returningData = {
+      roleTableData: roleTableData,
+      rolePermissionTableData: rolePermissionTableData,
+    };
+    resolve(returningData);
+  });
+};
+const update_role = (data) => {
+  return new Promise((resolve, reject) => {
+    Role.updateRole(data, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+const delete_role_permissions = (roleId) => {
+  return new Promise((resolve, reject) => {
+    Role.deleteRolePermissions(roleId, (err, res) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(res);
+    });
+  });
+};
+//----FUNCTIONS----------------------------------------------------------ENDS
 //-----------------------------------------------------------------------------------------------------------------
